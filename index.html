@@ -1,0 +1,522 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="en" class="dark"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;ANOMUS PRO | Hardware &amp; Engineering Platform&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&amp;family=Rajdhani:wght@500;600;700&amp;display=swap');</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: 'Rajdhani', sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: #05070a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #e2e8f0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.font-orbitron { font-family: 'Orbitron', sans-serif; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>@keyframes pulse-cyan {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>0%, 100% { filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.4)); }</p>
+<p class="p1"><span class="Apple-converted-space">      </span>50% { filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.8)); }</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.glow-logo { animation: pulse-cyan 3s infinite ease-in-out; }</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.glass-card {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(13, 18, 28, 0.7);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(12px);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid rgba(6, 182, 212, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.glass-card:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-color: rgba(6, 182, 212, 0.4);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>/* Modal styles */</p>
+<p class="p1"><span class="Apple-converted-space">    </span>.modal-backdrop {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: rgba(3, 7, 18, 0.85);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>backdrop-filter: blur(8px);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body class="min-h-screen overflow-x-hidden flex flex-col justify-between"&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 1. SPLASH LOADING SCREEN (5 SECONDS) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="splash-screen" class="fixed inset-0 z-50 bg-[#03060a] flex flex-col items-center justify-center p-4 transition-opacity duration-700"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="flex flex-col items-center max-w-md w-full text-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Metallic SVG Logo --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="w-48 h-48 mb-6 glow-logo flex items-center justify-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;svg viewBox="0 0 400 400" class="w-full h-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;defs&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;linearGradient id="splashMetal" x1="0%" y1="0%" x2="100%" y2="100%"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="0%" stop-color="#ffffff"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="40%" stop-color="#94a3b8"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="70%" stop-color="#334155"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="100%" stop-color="#0f172a"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/linearGradient&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;linearGradient id="splashCyan" x1="0%" y1="0%" x2="100%" y2="0%"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="0%" stop-color="#06b6d4"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;stop offset="100%" stop-color="#22d3ee"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/linearGradient&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;filter id="splashGlow"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;feGaussianBlur stdDeviation="6" result="blur" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;feComposite in="SourceGraphic" in2="blur" operator="over" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/filter&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/defs&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;path d="M 200 40 L 330 320 L 270 320 L 200 160 L 130 320 L 70 320 Z" fill="url(#splashMetal)" stroke="#64748b" stroke-width="2"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;path d="M 150 250 L 250 250 L 200 140 Z" fill="#0f172a" stroke="url(#splashCyan)" stroke-width="3" filter="url(#splashGlow)"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;circle cx="200" cy="210" r="18" fill="#030712" stroke="#06b6d4" stroke-width="3"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;circle cx="200" cy="210" r="8" fill="#06b6d4" filter="url(#splashGlow)"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;ellipse cx="200" cy="220" rx="160" ry="40" fill="none" stroke="url(#splashCyan)" stroke-width="2.5" transform="rotate(-15 200 220)" opacity="0.7"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Loading Spinner &amp; Text --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex items-center gap-3 mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="w-6 h-6 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h2 class="font-orbitron text-xl font-bold tracking-widest text-white"&gt;LOADING CONFIGURATION&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Progress Bar --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800 mb-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="splash-progress" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-100 ease-out"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex justify-between w-full text-xs font-mono text-slate-400"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span id="splash-status"&gt;INITIALIZING CORE...&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;span id="splash-percent"&gt;0%&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 2. MAIN HEADER &amp; NAVBAR --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;header class="border-b border-slate-800 bg-[#070b12]/80 backdrop-blur-md sticky top-0 z-40"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Brand Logo --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="w-10 h-10"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;svg viewBox="0 0 400 400" class="w-full h-full"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;path d="M 200 40 L 330 320 L 270 320 L 200 160 L 130 320 L 70 320 Z" fill="url(#splashMetal)"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;circle cx="200" cy="210" r="10" fill="#06b6d4"/&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/svg&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span class="font-orbitron text-lg font-black tracking-wider text-white"&gt;ANOMUS&lt;span class="text-cyan-400"&gt;.PRO&lt;/span&gt;&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p class="text-[10px] tracking-widest text-slate-400 uppercase font-mono"&gt;Hardware &amp; Engineering&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Action &amp; Auth Controls --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Mode Badge --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-user-shield text-slate-400"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;VIEWER MODE&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- Dynamic Action Button --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-lock"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;OWNER LOGIN&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button id="publish-btn" onclick="openPublishModal()" class="hidden px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-plus"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span&gt;PUBLISH BUILD&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/header&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 3. MAIN CONTENT AREA --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full"&gt;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Hero Banner --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="mb-10 text-center max-w-3xl mx-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;h1 class="font-orbitron text-3xl sm:text-4xl font-extrabold text-white tracking-wide mb-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>HARDWARE &amp; ROBOTICS &lt;span class="text-cyan-400"&gt;BLUEPRINTS&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="text-slate-400 text-sm sm:text-base"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>Explore verified hardware schematics and downloadable documentation.</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Category Filter Tabs --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="flex items-center justify-center gap-2 mb-8 flex-wrap"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="filterCategory('ALL')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50"&gt;ALL&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="filterCategory('ROBOTICS')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700"&gt;ROBOTICS&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="filterCategory('CIRCUITRY')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700"&gt;CIRCUITRY&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="filterCategory('IOT')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700"&gt;IOT HARDWARE&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;!-- Projects Grid / Empty State --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;!-- Empty State Card --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 text-slate-500"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-microchip text-2xl"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-orbitron text-lg font-bold text-white mb-1"&gt;NO PUBLISHED BUILDS YET&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;p class="text-slate-500 text-xs max-w-sm mx-auto mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>The hardware repository is completely clean. The owner can publish hardware builds with PDF documentation.</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/main&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 4. FOOTER --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;footer class="border-t border-slate-800/80 bg-[#03060a] py-6 text-center text-xs text-slate-500 font-mono"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;p&gt;© 2026 ANOMUS PRO • Hardware Engineering Platform&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/footer&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 5. OWNER AUTHENTICATION MODAL --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="auth-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex justify-between items-center mb-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-orbitron font-bold text-white text-sm flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-shield-halved text-cyan-400"&gt;&lt;/i&gt; OWNER ACCESS VERIFICATION</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="closeAuthModal()" class="text-slate-400 hover:text-white"&gt;&lt;i class="fa-solid fa-xmark"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p class="text-xs text-slate-400 mb-4"&gt;Enter the owner passcode to unlock build publishing privileges:&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 focus:border-cyan-500 outline-none font-mono" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;p id="auth-error" class="text-red-400 text-[11px] font-mono hidden mb-3"&gt;&lt;i class="fa-solid fa-circle-exclamation"&gt;&lt;/i&gt; Invalid passcode. Access denied.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>VERIFY OWNER PASSCODE</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 6. PUBLISH BUILD MODAL (OWNER ONLY) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="glass-card rounded-2xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto border border-cyan-500/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex justify-between items-center mb-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-upload text-cyan-400"&gt;&lt;/i&gt; PUBLISH HARDWARE BUILD</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;button onclick="closePublishModal()" class="text-slate-400 hover:text-white"&gt;&lt;i class="fa-solid fa-xmark"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;form id="publish-form" onsubmit="handlePublish(event)" class="space-y-4"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="block text-xs font-mono text-slate-400 mb-1"&gt;BUILD TITLE *&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;input type="text" id="build-title" required placeholder="e.g., Autonomous Bionic Arm Mk-1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="block text-xs font-mono text-slate-400 mb-1"&gt;CATEGORY *&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;select id="build-category" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 focus:border-cyan-500 outline-none"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="ROBOTICS"&gt;ROBOTICS&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="CIRCUITRY"&gt;CIRCUITRY&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;option value="IOT"&gt;IOT HARDWARE&lt;/option&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/select&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="block text-xs font-mono text-slate-400 mb-1"&gt;PROJECT DESCRIPTION *&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;textarea id="build-description" required rows="4" placeholder="Provide a detailed overview of the build, purpose, and system architecture..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none"&gt;&lt;/textarea&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;!-- PDF Attachment Field (Up to 100MB) --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;label class="block text-xs font-mono text-slate-400 mb-1"&gt;ATTACH PDF DOCUMENTATION (UP TO 100 MB) *&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="border-2 border-dashed border-slate-800 rounded-xl p-4 text-center bg-slate-950/50 hover:border-cyan-500/50 transition-colors"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="file" id="build-pdf" accept="application/pdf" required onchange="handleFileSelect(event)" class="hidden" /&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;label for="build-pdf" class="cursor-pointer flex flex-col items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;i class="fa-solid fa-file-pdf text-2xl text-cyan-400 mb-1"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span id="file-label" class="text-xs text-slate-300 font-mono"&gt;Click to choose PDF file&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="text-[10px] text-slate-500 mt-0.5"&gt;Maximum file size: 100 MB&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;p id="file-error" class="text-red-400 text-[11px] font-mono hidden mt-1"&gt;&lt;i class="fa-solid fa-circle-exclamation"&gt;&lt;/i&gt; File exceeds 100 MB limit.&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="pt-2 flex gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button type="button" onclick="closePublishModal()" class="w-1/2 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-orbitron font-bold"&gt;CANCEL&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button type="submit" class="w-1/2 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-orbitron font-bold shadow-lg shadow-cyan-500/20"&gt;PUBLISH&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/form&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- 7. FULLSCREEN PDF VIEWER MODAL FOR CUSTOMERS --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="pdf-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex flex-col p-4 sm:p-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="glass-card rounded-2xl flex-grow flex flex-col overflow-hidden border border-cyan-500/30"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;i class="fa-solid fa-file-pdf text-cyan-400"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;span id="pdf-modal-title" class="font-orbitron text-xs font-bold text-white"&gt;DOCUMENT VIEWER&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="flex items-center gap-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;a id="pdf-modal-download" download class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono flex items-center gap-1.5"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;i class="fa-solid fa-download"&gt;&lt;/i&gt; DOWNLOAD</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/a&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;button onclick="closePdfModal()" class="text-slate-400 hover:text-white"&gt;&lt;i class="fa-solid fa-xmark text-lg"&gt;&lt;/i&gt;&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;div class="flex-grow bg-slate-900"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;iframe id="pdf-frame" class="w-full h-full border-none"&gt;&lt;/iframe&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- JAVASCRIPT LOGIC --&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// PERMANENT OWNER PASSCODE</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let isOwnerLoggedIn = false;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let publishedProjects = [];</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let selectedPdfFile = null;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 1. SPLASH SCREEN ANIMATION (5 SECONDS) ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>window.addEventListener('DOMContentLoaded', () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const progressBar = document.getElementById('splash-progress');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const percentText = document.getElementById('splash-percent');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const statusText = document.getElementById('splash-status');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const splashScreen = document.getElementById('splash-screen');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>let progress = 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const interval = setInterval(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>progress += 2;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>progressBar.style.width = `${progress}%`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>percentText.innerText = `${progress}%`;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (progress === 30) statusText.innerText = "VERIFYING CORE SCHEMATICS...";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (progress === 70) statusText.innerText = "READY FOR DISPATCH...";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (progress &gt;= 100) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>clearInterval(interval);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>splashScreen.style.opacity = '0';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>setTimeout(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">              </span>splashScreen.style.display = 'none';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}, 700);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>}, 300);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}, 90); // ~5 seconds duration</p>
+<p class="p1"><span class="Apple-converted-space">    </span>});</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 2. AUTHENTICATION &amp; ACCESS CONTROL ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openAuthModal() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (isOwnerLoggedIn) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Logout if already logged in</p>
+<p class="p1"><span class="Apple-converted-space">        </span>isOwnerLoggedIn = false;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>updateRoleUI();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderProjects(publishedProjects);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('auth-modal').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('passcode-input').value = '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('auth-error').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function closeAuthModal() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('auth-modal').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function verifyPasscode() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const input = document.getElementById('passcode-input').value.trim();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (input === PERMANENT_OWNER_CODE) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>isOwnerLoggedIn = true;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>closeAuthModal();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>updateRoleUI();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderProjects(publishedProjects);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>document.getElementById('auth-error').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function updateRoleUI() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const roleBadge = document.getElementById('role-badge');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const authBtn = document.getElementById('auth-btn');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const publishBtn = document.getElementById('publish-btn');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (isOwnerLoggedIn) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center gap-1.5";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>roleBadge.innerHTML = '&lt;i class="fa-solid fa-user-check text-cyan-400"&gt;&lt;/i&gt;&lt;span&gt;OWNER MODE&lt;/span&gt;';</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>authBtn.innerHTML = '&lt;i class="fa-solid fa-right-from-bracket"&gt;&lt;/i&gt;&lt;span&gt;LOGOUT&lt;/span&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>authBtn.className = "px-3 py-1.5 rounded-lg text-xs font-orbitron font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-all";</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>publishBtn.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>roleBadge.innerHTML = '&lt;i class="fa-solid fa-user-shield text-slate-400"&gt;&lt;/i&gt;&lt;span&gt;VIEWER MODE&lt;/span&gt;';</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>authBtn.innerHTML = '&lt;i class="fa-solid fa-lock"&gt;&lt;/i&gt;&lt;span&gt;OWNER LOGIN&lt;/span&gt;';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>authBtn.className = "px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2";</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>publishBtn.classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 3. PUBLISH MODAL &amp; FILE HANDLING ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openPublishModal() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!isOwnerLoggedIn) return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('publish-modal').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function closePublishModal() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('publish-modal').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('publish-form').reset();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('file-label').innerText = "Click to choose PDF file";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('file-error').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>selectedPdfFile = null;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function handleFileSelect(e) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const file = e.target.files[0];</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const maxMb = 100;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (file) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (file.size &gt; maxMb * 1024 * 1024) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('file-error').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">          </span>e.target.value = '';</p>
+<p class="p1"><span class="Apple-converted-space">          </span>selectedPdfFile = null;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('file-label').innerText = "Click to choose PDF file";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('file-error').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">          </span>selectedPdfFile = file;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const sizeMb = (file.size / (1024 * 1024)).toFixed(2);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>document.getElementById('file-label').innerText = `${file.name} (${sizeMb} MB)`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function handlePublish(e) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>e.preventDefault();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!selectedPdfFile) return;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const title = document.getElementById('build-title').value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const category = document.getElementById('build-category').value;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const description = document.getElementById('build-description').value;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Create browser Blob URL for session PDF access</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const pdfUrl = URL.createObjectURL(selectedPdfFile);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const newProject = {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>id: Date.now(),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>title,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>category,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>description,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pdfName: selectedPdfFile.name,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pdfSize: (selectedPdfFile.size / (1024 * 1024)).toFixed(2),</p>
+<p class="p1"><span class="Apple-converted-space">        </span>pdfUrl: pdfUrl,</p>
+<p class="p1"><span class="Apple-converted-space">        </span>date: new Date().toLocaleDateString()</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>publishedProjects.unshift(newProject);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderProjects(publishedProjects);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>closePublishModal();</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 4. DELETE PROJECT (OWNER ONLY) ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function deleteProject(id) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (!isOwnerLoggedIn) return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>publishedProjects = publishedProjects.filter(p =&gt; p.id !== id);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>renderProjects(publishedProjects);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 5. RENDER PROJECTS GRID &amp; CUSTOMER ACCESS ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function renderProjects(projects) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const container = document.getElementById('projects-container');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const emptyState = document.getElementById('empty-state');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (projects.length === 0) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>container.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>container.appendChild(emptyState);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>emptyState.classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>container.innerHTML = '';</p>
+<p class="p1"><span class="Apple-converted-space">      </span>projects.forEach(proj =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const card = document.createElement('div');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>card.innerHTML = `</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex justify-between items-start mb-3"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20"&gt;${proj.category}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;div class="flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;span class="text-[10px] font-mono text-slate-500"&gt;${proj.date}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>${isOwnerLoggedIn ? `</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;button onclick="deleteProject(${proj.id})" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;i class="fa-solid fa-trash"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>` : ''}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h3 class="font-orbitron font-bold text-base text-white mb-2"&gt;${proj.title}&lt;/h3&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;p class="text-xs text-slate-300 mb-6 leading-relaxed"&gt;${proj.description}&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono overflow-hidden"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;i class="fa-solid fa-file-pdf text-cyan-400"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="truncate max-w-[120px]"&gt;${proj.pdfName}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span class="text-[10px] text-slate-600"&gt;(${proj.pdfSize} MB)&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}', '${proj.pdfName}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;i class="fa-solid fa-eye"&gt;&lt;/i&gt; VIEW</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;a href="${proj.pdfUrl}" download="${proj.pdfName}" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-all flex items-center gap-1"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;i class="fa-solid fa-download"&gt;&lt;/i&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/a&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>`;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>container.appendChild(card);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 6. PDF VIEWER MODAL FOR CUSTOMERS ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function openPdfModal(url, title, filename) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('pdf-modal').classList.remove('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('pdf-modal-title').innerText = title.toUpperCase();</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('pdf-frame').src = url;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const downloadBtn = document.getElementById('pdf-modal-download');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>downloadBtn.href = url;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>downloadBtn.download = filename;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>function closePdfModal() {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('pdf-modal').classList.add('hidden');</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.getElementById('pdf-frame').src = '';</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// --- 7. CATEGORY FILTER ---</p>
+<p class="p1"><span class="Apple-converted-space">    </span>function filterCategory(cat) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Update UI active state</p>
+<p class="p1"><span class="Apple-converted-space">      </span>document.querySelectorAll('.cat-btn').forEach(btn =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>btn.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700";</p>
+<p class="p1"><span class="Apple-converted-space">      </span>});</p>
+<p class="p1"><span class="Apple-converted-space">      </span>event.target.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50";</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (cat === 'ALL') {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderProjects(publishedProjects);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const filtered = publishedProjects.filter(p =&gt; p.category === cat);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>renderProjects(filtered);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
