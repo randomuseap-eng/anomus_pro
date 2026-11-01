@@ -32,7 +32,6 @@
       box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
     }
 
-    /* Modal styles */
     .modal-backdrop {
       background: rgba(3, 7, 18, 0.85);
       backdrop-filter: blur(8px);
@@ -41,10 +40,9 @@
 </head>
 <body class="min-h-screen overflow-x-hidden flex flex-col justify-between">
 
-  <!-- 1. SPLASH LOADING SCREEN (5 SECONDS) -->
+  <!-- 1. SPLASH LOADING SCREEN -->
   <div id="splash-screen" class="fixed inset-0 z-50 bg-[#03060a] flex flex-col items-center justify-center p-4 transition-opacity duration-700">
     <div class="flex flex-col items-center max-w-md w-full text-center">
-      <!-- Metallic SVG Logo -->
       <div class="w-48 h-48 mb-6 glow-logo flex items-center justify-center">
         <svg viewBox="0 0 400 400" class="w-full h-full">
           <defs>
@@ -71,27 +69,24 @@
         </svg>
       </div>
 
-      <!-- Loading Spinner & Text -->
       <div class="flex items-center gap-3 mb-4">
         <div class="w-6 h-6 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-        <h2 class="font-orbitron text-xl font-bold tracking-widest text-white">LOADING CONFIGURATION</h2>
+        <h2 class="font-orbitron text-xl font-bold tracking-widest text-white">CONNECTING TO CLOUD...</h2>
       </div>
 
-      <!-- Progress Bar -->
       <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800 mb-2">
         <div id="splash-progress" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-100 ease-out"></div>
       </div>
       <div class="flex justify-between w-full text-xs font-mono text-slate-400">
-        <span id="splash-status">INITIALIZING CORE...</span>
+        <span id="splash-status">INITIALIZING DATABASE...</span>
         <span id="splash-percent">0%</span>
       </div>
     </div>
   </div>
 
-  <!-- 2. MAIN HEADER & NAVBAR -->
+  <!-- 2. NAVBAR -->
   <header class="border-b border-slate-800 bg-[#070b12]/80 backdrop-blur-md sticky top-0 z-40">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <!-- Brand Logo -->
       <div class="flex items-center gap-3">
         <div class="w-10 h-10">
           <svg viewBox="0 0 400 400" class="w-full h-full">
@@ -101,19 +96,16 @@
         </div>
         <div>
           <span class="font-orbitron text-lg font-black tracking-wider text-white">ANOMUS<span class="text-cyan-400">.PRO</span></span>
-          <p class="text-[10px] tracking-widest text-slate-400 uppercase font-mono">Hardware & Engineering</p>
+          <p class="text-[10px] tracking-widest text-slate-400 uppercase font-mono">Global Hardware Database</p>
         </div>
       </div>
 
-      <!-- Action & Auth Controls -->
       <div class="flex items-center gap-3">
-        <!-- Mode Badge -->
         <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
           <i class="fa-solid fa-user-shield text-slate-400"></i>
           <span>VIEWER MODE</span>
         </div>
 
-        <!-- Dynamic Action Button -->
         <button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2">
           <i class="fa-solid fa-lock"></i>
           <span>OWNER LOGIN</span>
@@ -130,17 +122,16 @@
   <!-- 3. MAIN CONTENT AREA -->
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
     
-    <!-- Hero Banner -->
     <div class="mb-10 text-center max-w-3xl mx-auto">
       <h1 class="font-orbitron text-3xl sm:text-4xl font-extrabold text-white tracking-wide mb-3">
         HARDWARE & ROBOTICS <span class="text-cyan-400">BLUEPRINTS</span>
       </h1>
       <p class="text-slate-400 text-sm sm:text-base">
-        Explore verified hardware schematics and downloadable documentation.
+        Cloud-synced verified hardware schematics and downloadable documentation.
       </p>
     </div>
 
-    <!-- Category Filter Tabs -->
+    <!-- Category Filter -->
     <div class="flex items-center justify-center gap-2 mb-8 flex-wrap">
       <button onclick="filterCategory('ALL')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50">ALL</button>
       <button onclick="filterCategory('ROBOTICS')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">ROBOTICS</button>
@@ -148,16 +139,15 @@
       <button onclick="filterCategory('IOT')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">IOT HARDWARE</button>
     </div>
 
-    <!-- Projects Grid / Empty State -->
+    <!-- Projects Grid -->
     <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <!-- Empty State Card -->
       <div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800">
         <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 text-slate-500">
-          <i class="fa-solid fa-microchip text-2xl"></i>
+          <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
         </div>
         <h3 class="font-orbitron text-lg font-bold text-white mb-1">NO PUBLISHED BUILDS YET</h3>
         <p class="text-slate-500 text-xs max-w-sm mx-auto mb-6">
-          The hardware repository is completely clean. The owner can publish hardware builds with PDF documentation.
+          The cloud database is empty. The owner can publish projects with web links or cloud hosted PDFs.
         </p>
       </div>
     </div>
@@ -165,7 +155,7 @@
 
   <!-- 4. FOOTER -->
   <footer class="border-t border-slate-800/80 bg-[#03060a] py-6 text-center text-xs text-slate-500 font-mono">
-    <p>© 2026 ANOMUS PRO • Hardware Engineering Platform</p>
+    <p>© 2026 ANOMUS PRO • Cloud Synchronized Platform</p>
   </footer>
 
   <!-- 5. OWNER AUTHENTICATION MODAL -->
@@ -177,7 +167,7 @@
         </h3>
         <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <p class="text-xs text-slate-400 mb-4">Enter the owner passcode to unlock build publishing privileges:</p>
+      <p class="text-xs text-slate-400 mb-4">Enter the owner passcode to unlock cloud publishing privileges:</p>
       <input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 focus:border-cyan-500 outline-none font-mono" />
       <p id="auth-error" class="text-red-400 text-[11px] font-mono hidden mb-3"><i class="fa-solid fa-circle-exclamation"></i> Invalid passcode. Access denied.</p>
       <button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs">
@@ -186,12 +176,12 @@
     </div>
   </div>
 
-  <!-- 6. PUBLISH BUILD MODAL (OWNER ONLY) -->
+  <!-- 6. PUBLISH BUILD MODAL -->
   <div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto border border-cyan-500/30">
       <div class="flex justify-between items-center mb-6">
         <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
-          <i class="fa-solid fa-upload text-cyan-400"></i> PUBLISH HARDWARE BUILD
+          <i class="fa-solid fa-upload text-cyan-400"></i> PUBLISH TO CLOUD DATABASE
         </h3>
         <button onclick="closePublishModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
       </div>
@@ -213,32 +203,24 @@
 
         <div>
           <label class="block text-xs font-mono text-slate-400 mb-1">PROJECT DESCRIPTION *</label>
-          <textarea id="build-description" required rows="4" placeholder="Provide a detailed overview of the build, purpose, and system architecture..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none"></textarea>
+          <textarea id="build-description" required rows="4" placeholder="Provide details about the hardware design..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none"></textarea>
         </div>
 
-        <!-- PDF Attachment Field (Up to 100MB) -->
         <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">ATTACH PDF DOCUMENTATION (UP TO 100 MB) *</label>
-          <div class="border-2 border-dashed border-slate-800 rounded-xl p-4 text-center bg-slate-950/50 hover:border-cyan-500/50 transition-colors">
-            <input type="file" id="build-pdf" accept="application/pdf" required onchange="handleFileSelect(event)" class="hidden" />
-            <label for="build-pdf" class="cursor-pointer flex flex-col items-center">
-              <i class="fa-solid fa-file-pdf text-2xl text-cyan-400 mb-1"></i>
-              <span id="file-label" class="text-xs text-slate-300 font-mono">Click to choose PDF file</span>
-              <span class="text-[10px] text-slate-500 mt-0.5">Maximum file size: 100 MB</span>
-            </label>
-          </div>
-          <p id="file-error" class="text-red-400 text-[11px] font-mono hidden mt-1"><i class="fa-solid fa-circle-exclamation"></i> File exceeds 100 MB limit.</p>
+          <label class="block text-xs font-mono text-slate-400 mb-1">PERSISTENT PDF / SCHEMATIC LINK (PUBLIC URL) *</label>
+          <input type="url" id="build-pdf-url" required placeholder="https://example.com/schematic.pdf" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none" />
+          <p class="text-[10px] text-slate-500 mt-1">Provide a direct public link (Drive, Dropbox, GitHub raw file link, or cloud file URL).</p>
         </div>
 
         <div class="pt-2 flex gap-3">
           <button type="button" onclick="closePublishModal()" class="w-1/2 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-orbitron font-bold">CANCEL</button>
-          <button type="submit" class="w-1/2 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-orbitron font-bold shadow-lg shadow-cyan-500/20">PUBLISH</button>
+          <button type="submit" id="submit-publish-btn" class="w-1/2 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-orbitron font-bold shadow-lg shadow-cyan-500/20">PUBLISH TO WORLD</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- 7. FULLSCREEN PDF VIEWER MODAL FOR CUSTOMERS -->
+  <!-- 7. PDF VIEWER MODAL -->
   <div id="pdf-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex flex-col p-4 sm:p-8">
     <div class="glass-card rounded-2xl flex-grow flex flex-col overflow-hidden border border-cyan-500/30">
       <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
@@ -247,8 +229,8 @@
           <span id="pdf-modal-title" class="font-orbitron text-xs font-bold text-white">DOCUMENT VIEWER</span>
         </div>
         <div class="flex items-center gap-3">
-          <a id="pdf-modal-download" download class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono flex items-center gap-1.5">
-            <i class="fa-solid fa-download"></i> DOWNLOAD
+          <a id="pdf-modal-download" target="_blank" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono flex items-center gap-1.5">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> OPEN EXTERNAL
           </a>
           <button onclick="closePdfModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
         </div>
@@ -259,35 +241,68 @@
     </div>
   </div>
 
-  <!-- JAVASCRIPT LOGIC -->
-  <script>
-    // PERMANENT OWNER PASSCODE
-    const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
+  <!-- FIREBASE ENGINE & APP LOGIC -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // App ID configuration
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'anomus-pro';
     
+    // Default fallback config for standard web deployments
+    const firebaseConfig = typeof __firebase_config !== 'undefined' 
+      ? JSON.parse(__firebase_config) 
+      : {
+          apiKey: "AIzaSyDemoConfigKeyForPublicViewerOnly",
+          authDomain: "anomus-pro.firebaseapp.com",
+          projectId: "anomus-pro",
+          storageBucket: "anomus-pro.appspot.com",
+          messagingSenderId: "123456789",
+          appId: "1:123456789:web:abcdef123456"
+        };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
     let isOwnerLoggedIn = false;
     let publishedProjects = [];
-    let selectedPdfFile = null;
+    let currentCategoryFilter = 'ALL';
 
-    // --- LOAD PROJECTS FROM LOCALSTORAGE ON START ---
-    function loadSavedProjects() {
-      const saved = localStorage.getItem('anomus_projects');
-      if (saved) {
-        try {
-          publishedProjects = JSON.parse(saved);
-        } catch (e) {
-          publishedProjects = [];
+    // Authenticate user anonymously to allow reading public database
+    async function initAuth() {
+      try {
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
         }
+      } catch (err) {
+        console.warn("Auth initialization fallback:", err);
       }
+      setupRealtimeListener();
     }
 
-    function saveProjectsToStorage() {
-      localStorage.setItem('anomus_projects', JSON.stringify(publishedProjects));
+    // Set up real-time listener for global syncing across all users
+    function setupRealtimeListener() {
+      const publicColRef = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+
+      onSnapshot(publicColRef, (snapshot) => {
+        publishedProjects = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }));
+        renderProjects();
+      }, (error) => {
+        console.error("Firestore real-time subscription error:", error);
+      });
     }
 
-    // --- 1. SPLASH SCREEN ANIMATION (5 SECONDS) ---
+    // Splash Screen animation
     window.addEventListener('DOMContentLoaded', () => {
-      loadSavedProjects();
-      renderProjects(publishedProjects);
+      initAuth();
 
       const progressBar = document.getElementById('splash-progress');
       const percentText = document.getElementById('splash-percent');
@@ -296,12 +311,13 @@
 
       let progress = 0;
       const interval = setInterval(() => {
-        progress += 2;
+        progress += 4;
+        if (progress > 100) progress = 100;
         progressBar.style.width = `${progress}%`;
         percentText.innerText = `${progress}%`;
 
-        if (progress === 30) statusText.innerText = "VERIFYING CORE SCHEMATICS...";
-        if (progress === 70) statusText.innerText = "READY FOR DISPATCH...";
+        if (progress === 40) statusText.innerText = "VERIFYING CLOUD NODE...";
+        if (progress === 80) statusText.innerText = "SYNCHRONIZING BLUEPRINTS...";
 
         if (progress >= 100) {
           clearInterval(interval);
@@ -310,39 +326,39 @@
             setTimeout(() => {
               splashScreen.style.display = 'none';
             }, 700);
-          }, 300);
+          }, 200);
         }
-      }, 90);
+      }, 50);
     });
 
-    // --- 2. AUTHENTICATION & ACCESS CONTROL ---
-    function openAuthModal() {
+    // Owner Login Functions
+    window.openAuthModal = function() {
       if (isOwnerLoggedIn) {
         isOwnerLoggedIn = false;
         updateRoleUI();
-        renderProjects(publishedProjects);
+        renderProjects();
         return;
       }
       document.getElementById('auth-modal').classList.remove('hidden');
       document.getElementById('passcode-input').value = '';
       document.getElementById('auth-error').classList.add('hidden');
-    }
+    };
 
-    function closeAuthModal() {
+    window.closeAuthModal = function() {
       document.getElementById('auth-modal').classList.add('hidden');
-    }
+    };
 
-    function verifyPasscode() {
+    window.verifyPasscode = function() {
       const input = document.getElementById('passcode-input').value.trim();
       if (input === PERMANENT_OWNER_CODE) {
         isOwnerLoggedIn = true;
         closeAuthModal();
         updateRoleUI();
-        renderProjects(publishedProjects);
+        renderProjects();
       } else {
         document.getElementById('auth-error').classList.remove('hidden');
       }
-    }
+    };
 
     function updateRoleUI() {
       const roleBadge = document.getElementById('role-badge');
@@ -368,80 +384,73 @@
       }
     }
 
-    // --- 3. PUBLISH MODAL & FILE HANDLING ---
-    function openPublishModal() {
+    // Modal Control Functions
+    window.openPublishModal = function() {
       if (!isOwnerLoggedIn) return;
       document.getElementById('publish-modal').classList.remove('hidden');
-    }
+    };
 
-    function closePublishModal() {
+    window.closePublishModal = function() {
       document.getElementById('publish-modal').classList.add('hidden');
       document.getElementById('publish-form').reset();
-      document.getElementById('file-label').innerText = "Click to choose PDF file";
-      document.getElementById('file-error').classList.add('hidden');
-      selectedPdfFile = null;
-    }
+    };
 
-    function handleFileSelect(e) {
-      const file = e.target.files[0];
-      const maxMb = 100;
-
-      if (file) {
-        if (file.size > maxMb * 1024 * 1024) {
-          document.getElementById('file-error').classList.remove('hidden');
-          e.target.value = '';
-          selectedPdfFile = null;
-          document.getElementById('file-label').innerText = "Click to choose PDF file";
-        } else {
-          document.getElementById('file-error').classList.add('hidden');
-          selectedPdfFile = file;
-          const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-          document.getElementById('file-label').innerText = `${file.name} (${sizeMb} MB)`;
-        }
-      }
-    }
-
-    function handlePublish(e) {
+    // Global Database Write Action
+    window.handlePublish = async function(e) {
       e.preventDefault();
-      if (!selectedPdfFile) return;
+      if (!isOwnerLoggedIn) return;
+
+      const submitBtn = document.getElementById('submit-publish-btn');
+      submitBtn.innerText = "SAVING TO DATABASE...";
+      submitBtn.disabled = true;
 
       const title = document.getElementById('build-title').value;
       const category = document.getElementById('build-category').value;
       const description = document.getElementById('build-description').value;
+      const pdfUrl = document.getElementById('build-pdf-url').value;
 
-      const pdfUrl = URL.createObjectURL(selectedPdfFile);
+      try {
+        const publicColRef = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
+        await addDoc(publicColRef, {
+          title,
+          category,
+          description,
+          pdfUrl,
+          createdAt: new Date().toISOString(),
+          date: new Date().toLocaleDateString()
+        });
 
-      const newProject = {
-        id: Date.now(),
-        title,
-        category,
-        description,
-        pdfName: selectedPdfFile.name,
-        pdfSize: (selectedPdfFile.size / (1024 * 1024)).toFixed(2),
-        pdfUrl: pdfUrl,
-        date: new Date().toLocaleDateString()
-      };
+        closePublishModal();
+      } catch (err) {
+        console.error("Error adding project to cloud:", err);
+      } finally {
+        submitBtn.innerText = "PUBLISH TO WORLD";
+        submitBtn.disabled = false;
+      }
+    };
 
-      publishedProjects.unshift(newProject);
-      saveProjectsToStorage();
-      renderProjects(publishedProjects);
-      closePublishModal();
-    }
-
-    // --- 4. DELETE PROJECT (OWNER ONLY) ---
-    function deleteProject(id) {
+    // Delete Project from Cloud
+    window.deleteProject = async function(id) {
       if (!isOwnerLoggedIn) return;
-      publishedProjects = publishedProjects.filter(p => p.id !== id);
-      saveProjectsToStorage();
-      renderProjects(publishedProjects);
-    }
+      try {
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', id);
+        await deleteDoc(docRef);
+      } catch (err) {
+        console.error("Error deleting project:", err);
+      }
+    };
 
-    // --- 5. RENDER PROJECTS GRID & CUSTOMER ACCESS ---
-    function renderProjects(projects) {
+    // Render Projects List
+    function renderProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
 
-      if (projects.length === 0) {
+      let filtered = publishedProjects;
+      if (currentCategoryFilter !== 'ALL') {
+        filtered = publishedProjects.filter(p => p.category === currentCategoryFilter);
+      }
+
+      if (filtered.length === 0) {
         container.innerHTML = '';
         container.appendChild(emptyState);
         emptyState.classList.remove('hidden');
@@ -449,7 +458,7 @@
       }
 
       container.innerHTML = '';
-      projects.forEach(proj => {
+      filtered.forEach(proj => {
         const card = document.createElement('div');
         card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";
         card.innerHTML = `
@@ -457,9 +466,9 @@
             <div class="flex justify-between items-start mb-3">
               <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${proj.category}</span>
               <div class="flex items-center gap-2">
-                <span class="text-[10px] font-mono text-slate-500">${proj.date}</span>
+                <span class="text-[10px] font-mono text-slate-500">${proj.date || ''}</span>
                 ${isOwnerLoggedIn ? `
-                  <button onclick="deleteProject(${proj.id})" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
+                  <button onclick="deleteProject('${proj.id}')" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
                     <i class="fa-solid fa-trash"></i>
                   </button>
                 ` : ''}
@@ -471,17 +480,14 @@
 
           <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
             <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono overflow-hidden">
-              <i class="fa-solid fa-file-pdf text-cyan-400"></i>
-              <span class="truncate max-w-[120px]">${proj.pdfName}</span>
-              <span class="text-[10px] text-slate-600">(${proj.pdfSize} MB)</span>
+              <i class="fa-solid fa-link text-cyan-400"></i>
+              <span class="truncate max-w-[140px] text-[11px]">${proj.pdfUrl}</span>
             </div>
 
             <div class="flex items-center gap-2">
-              ${proj.pdfUrl ? `
-                <button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}', '${proj.pdfName}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
-                  <i class="fa-solid fa-eye"></i> VIEW
-                </button>
-              ` : ''}
+              <button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
+                <i class="fa-solid fa-eye"></i> VIEW
+              </button>
             </div>
           </div>
         `;
@@ -489,36 +495,31 @@
       });
     }
 
-    // --- 6. PDF VIEWER MODAL FOR CUSTOMERS ---
-    function openPdfModal(url, title, filename) {
+    // Modal PDF Viewer
+    window.openPdfModal = function(url, title) {
       if (!url) return;
       document.getElementById('pdf-modal').classList.remove('hidden');
       document.getElementById('pdf-modal-title').innerText = title.toUpperCase();
       document.getElementById('pdf-frame').src = url;
       const downloadBtn = document.getElementById('pdf-modal-download');
       downloadBtn.href = url;
-      downloadBtn.download = filename;
-    }
+    };
 
-    function closePdfModal() {
+    window.closePdfModal = function() {
       document.getElementById('pdf-modal').classList.add('hidden');
       document.getElementById('pdf-frame').src = '';
-    }
+    };
 
-    // --- 7. CATEGORY FILTER ---
-    function filterCategory(cat) {
-      document.querySelectorAll('.cat-btn').forEach(btn => {
+    // Category Filter Buttons Handler
+    window.filterCategory = function(cat) {
+      currentCategoryFilter = cat;
+      const buttons = document.querySelectorAll('.cat-btn');
+      buttons.forEach(btn => {
         btn.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700";
       });
       event.target.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50";
-
-      if (cat === 'ALL') {
-        renderProjects(publishedProjects);
-      } else {
-        const filtered = publishedProjects.filter(p => p.category === cat);
-        renderProjects(filtered);
-      }
-    }
+      renderProjects();
+    };
   </script>
 </body>
 </html>
