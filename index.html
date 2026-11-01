@@ -6,347 +6,41 @@
   <title>ANOMUS PRO | Hardware & Engineering Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap');
-    
-    body {
-      font-family: 'Rajdhani', sans-serif;
-      background-color: #05070a;
-      color: #e2e8f0;
-    }
-    .font-orbitron { font-family: 'Orbitron', sans-serif; }
-
-    @keyframes pulse-cyan {
-      0%, 100% { filter: drop-shadow(0 0 15px rgba(6, 182, 212, 0.4)); }
-      50% { filter: drop-shadow(0 0 35px rgba(6, 182, 212, 0.8)); }
-    }
-    .glow-logo { animation: pulse-cyan 3s infinite ease-in-out; }
-
-    .glass-card {
-      background: rgba(13, 18, 28, 0.7);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(6, 182, 212, 0.15);
-    }
-    .glass-card:hover {
-      border-color: rgba(6, 182, 212, 0.4);
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.15);
-    }
-
-    .modal-backdrop {
-      background: rgba(3, 7, 18, 0.85);
-      backdrop-filter: blur(8px);
-    }
-  </style>
-</head>
-<body class="min-h-screen overflow-x-hidden flex flex-col justify-between">
-
-  <!-- 1. SPLASH LOADING SCREEN -->
-  <div id="splash-screen" class="fixed inset-0 z-50 bg-[#03060a] flex flex-col items-center justify-center p-4 transition-opacity duration-700">
-    <div class="flex flex-col items-center max-w-md w-full text-center">
-      <div class="w-48 h-48 mb-6 glow-logo flex items-center justify-center">
-        <svg viewBox="0 0 400 400" class="w-full h-full">
-          <defs>
-            <linearGradient id="splashMetal" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ffffff"/>
-              <stop offset="40%" stop-color="#94a3b8"/>
-              <stop offset="70%" stop-color="#334155"/>
-              <stop offset="100%" stop-color="#0f172a"/>
-            </linearGradient>
-            <linearGradient id="splashCyan" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#06b6d4"/>
-              <stop offset="100%" stop-color="#22d3ee"/>
-            </linearGradient>
-            <filter id="splashGlow">
-              <feGaussianBlur stdDeviation="6" result="blur" />
-              <feComposite in="SourceGraphic" in2="blur" operator="over" />
-            </filter>
-          </defs>
-          <path d="M 200 40 L 330 320 L 270 320 L 200 160 L 130 320 L 70 320 Z" fill="url(#splashMetal)" stroke="#64748b" stroke-width="2"/>
-          <path d="M 150 250 L 250 250 L 200 140 Z" fill="#0f172a" stroke="url(#splashCyan)" stroke-width="3" filter="url(#splashGlow)"/>
-          <circle cx="200" cy="210" r="18" fill="#030712" stroke="#06b6d4" stroke-width="3"/>
-          <circle cx="200" cy="210" r="8" fill="#06b6d4" filter="url(#splashGlow)"/>
-          <ellipse cx="200" cy="220" rx="160" ry="40" fill="none" stroke="url(#splashCyan)" stroke-width="2.5" transform="rotate(-15 200 220)" opacity="0.7"/>
-        </svg>
-      </div>
-
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-6 h-6 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin"></div>
-        <h2 class="font-orbitron text-xl font-bold tracking-widest text-white">CONNECTING TO CLOUD...</h2>
-      </div>
-
-      <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800 mb-2">
-        <div id="splash-progress" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-0 transition-all duration-100 ease-out"></div>
-      </div>
-      <div class="flex justify-between w-full text-xs font-mono text-slate-400">
-        <span id="splash-status">INITIALIZING DATABASE...</span>
-        <span id="splash-percent">0%</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- 2. NAVBAR -->
-  <header class="border-b border-slate-800 bg-[#070b12]/80 backdrop-blur-md sticky top-0 z-40">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10">
-          <svg viewBox="0 0 400 400" class="w-full h-full">
-            <path d="M 200 40 L 330 320 L 270 320 L 200 160 L 130 320 L 70 320 Z" fill="url(#splashMetal)"/>
-            <circle cx="200" cy="210" r="10" fill="#06b6d4"/>
-          </svg>
-        </div>
-        <div>
-          <span class="font-orbitron text-lg font-black tracking-wider text-white">ANOMUS<span class="text-cyan-400">.PRO</span></span>
-          <p class="text-[10px] tracking-widest text-slate-400 uppercase font-mono">Global Hardware Database</p>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-3">
-        <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
-          <i class="fa-solid fa-user-shield text-slate-400"></i>
-          <span>VIEWER MODE</span>
-        </div>
-
-        <button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2">
-          <i class="fa-solid fa-lock"></i>
-          <span>OWNER LOGIN</span>
-        </button>
-
-        <button id="publish-btn" onclick="openPublishModal()" class="hidden px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-cyan-500 hover:bg-cyan-400 text-slate-950 transition-all shadow-lg shadow-cyan-500/20 flex items-center gap-2">
-          <i class="fa-solid fa-plus"></i>
-          <span>PUBLISH BUILD</span>
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- 3. MAIN CONTENT AREA -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full">
-    
-    <div class="mb-10 text-center max-w-3xl mx-auto">
-      <h1 class="font-orbitron text-3xl sm:text-4xl font-extrabold text-white tracking-wide mb-3">
-        HARDWARE & ROBOTICS <span class="text-cyan-400">BLUEPRINTS</span>
-      </h1>
-      <p class="text-slate-400 text-sm sm:text-base">
-        Cloud-synced verified hardware schematics and downloadable documentation.
-      </p>
-    </div>
-
-    <!-- Category Filter -->
-    <div class="flex items-center justify-center gap-2 mb-8 flex-wrap">
-      <button onclick="filterCategory('ALL')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50">ALL</button>
-      <button onclick="filterCategory('ROBOTICS')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">ROBOTICS</button>
-      <button onclick="filterCategory('CIRCUITRY')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">CIRCUITRY</button>
-      <button onclick="filterCategory('IOT')" class="cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700">IOT HARDWARE</button>
-    </div>
-
-    <!-- Projects Grid -->
-    <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-900 flex items-center justify-center border border-slate-800 text-slate-500">
-          <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
-        </div>
-        <h3 class="font-orbitron text-lg font-bold text-white mb-1">NO PUBLISHED BUILDS YET</h3>
-        <p class="text-slate-500 text-xs max-w-sm mx-auto mb-6">
-          The cloud database is empty. The owner can publish projects with web links or cloud hosted PDFs.
-        </p>
-      </div>
-    </div>
-  </main>
-
-  <!-- 4. FOOTER -->
-  <footer class="border-t border-slate-800/80 bg-[#03060a] py-6 text-center text-xs text-slate-500 font-mono">
-    <p>© 2026 ANOMUS PRO • Cloud Synchronized Platform</p>
-  </footer>
-
-  <!-- 5. OWNER AUTHENTICATION MODAL -->
-  <div id="auth-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/30">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="font-orbitron font-bold text-white text-sm flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-cyan-400"></i> OWNER ACCESS VERIFICATION
-        </h3>
-        <button onclick="closeAuthModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <p class="text-xs text-slate-400 mb-4">Enter the owner passcode to unlock cloud publishing privileges:</p>
-      <input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 focus:border-cyan-500 outline-none font-mono" />
-      <p id="auth-error" class="text-red-400 text-[11px] font-mono hidden mb-3"><i class="fa-solid fa-circle-exclamation"></i> Invalid passcode. Access denied.</p>
-      <button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs">
-        VERIFY OWNER PASSCODE
-      </button>
-    </div>
-  </div>
-
-  <!-- 6. PUBLISH BUILD MODAL -->
-  <div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl p-6 max-w-xl w-full max-h-[90vh] overflow-y-auto border border-cyan-500/30">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="font-orbitron font-bold text-white text-base flex items-center gap-2">
-          <i class="fa-solid fa-upload text-cyan-400"></i> PUBLISH TO CLOUD DATABASE
-        </h3>
-        <button onclick="closePublishModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-
-      <form id="publish-form" onsubmit="handlePublish(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">BUILD TITLE *</label>
-          <input type="text" id="build-title" required placeholder="e.g., Autonomous Bionic Arm Mk-1" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none" />
-        </div>
-
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">CATEGORY *</label>
-          <select id="build-category" required class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 focus:border-cyan-500 outline-none">
-            <option value="ROBOTICS">ROBOTICS</option>
-            <option value="CIRCUITRY">CIRCUITRY</option>
-            <option value="IOT">IOT HARDWARE</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">PROJECT DESCRIPTION *</label>
-          <textarea id="build-description" required rows="4" placeholder="Provide details about the hardware design..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">PERSISTENT PDF / SCHEMATIC LINK (PUBLIC URL) *</label>
-          <input type="url" id="build-pdf-url" required placeholder="https://example.com/schematic.pdf" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white focus:border-cyan-500 outline-none" />
-          <p class="text-[10px] text-slate-500 mt-1">Provide a direct public link (Drive, Dropbox, GitHub raw file link, or cloud file URL).</p>
-        </div>
-
-        <div class="pt-2 flex gap-3">
-          <button type="button" onclick="closePublishModal()" class="w-1/2 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-orbitron font-bold">CANCEL</button>
-          <button type="submit" id="submit-publish-btn" class="w-1/2 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-orbitron font-bold shadow-lg shadow-cyan-500/20">PUBLISH TO WORLD</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- 7. PDF VIEWER MODAL -->
-  <div id="pdf-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex flex-col p-4 sm:p-8">
-    <div class="glass-card rounded-2xl flex-grow flex flex-col overflow-hidden border border-cyan-500/30">
-      <div class="p-4 border-b border-slate-800 flex justify-between items-center bg-slate-950">
-        <div class="flex items-center gap-2">
-          <i class="fa-solid fa-file-pdf text-cyan-400"></i>
-          <span id="pdf-modal-title" class="font-orbitron text-xs font-bold text-white">DOCUMENT VIEWER</span>
-        </div>
-        <div class="flex items-center gap-3">
-          <a id="pdf-modal-download" target="_blank" class="px-3 py-1 rounded bg-slate-800 hover:bg-slate-700 text-cyan-400 text-xs font-mono flex items-center gap-1.5">
-            <i class="fa-solid fa-arrow-up-right-from-square"></i> OPEN EXTERNAL
-          </a>
-          <button onclick="closePdfModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-        </div>
-      </div>
-      <div class="flex-grow bg-slate-900">
-        <iframe id="pdf-frame" class="w-full h-full border-none"></iframe>
-      </div>
-    </div>
-  </div>
-
-  <!-- FIREBASE ENGINE & APP LOGIC -->
+  <!-- Firebase SDKs -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // App ID configuration
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'anomus-pro';
-    
-    // Default fallback config for standard web deployments
-    const firebaseConfig = typeof __firebase_config !== 'undefined' 
-      ? JSON.parse(__firebase_config) 
-      : {
-          apiKey: "AIzaSyDemoConfigKeyForPublicViewerOnly",
-          authDomain: "anomus-pro.firebaseapp.com",
-          projectId: "anomus-pro",
-          storageBucket: "anomus-pro.appspot.com",
-          messagingSenderId: "123456789",
-          appId: "1:123456789:web:abcdef123456"
-        };
+    // TODO: REPLACE WITH YOUR FIREBASE CONFIG FROM STEP 3
+    const firebaseConfig = {
+      apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_P95iTUc",
+      authDomain: "anomus-pro.firebaseapp.com",
+      projectId: "anomus-pro",
+      storageBucket: "anomus-pro.firebasestorage.app",
+      messagingSenderId: "573201820218",
+      appId: "1:573201820218:web:b110e43cebf7a084c82303"
+    };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
 
     const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
     let isOwnerLoggedIn = false;
-    let publishedProjects = [];
-    let currentCategoryFilter = 'ALL';
 
-    // Authenticate user anonymously to allow reading public database
-    async function initAuth() {
-      try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
-      } catch (err) {
-        console.warn("Auth initialization fallback:", err);
-      }
-      setupRealtimeListener();
-    }
-
-    // Set up real-time listener for global syncing across all users
-    function setupRealtimeListener() {
-      const publicColRef = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-
-      onSnapshot(publicColRef, (snapshot) => {
-        publishedProjects = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
-        renderProjects();
-      }, (error) => {
-        console.error("Firestore real-time subscription error:", error);
-      });
-    }
-
-    // Splash Screen animation
-    window.addEventListener('DOMContentLoaded', () => {
-      initAuth();
-
-      const progressBar = document.getElementById('splash-progress');
-      const percentText = document.getElementById('splash-percent');
-      const statusText = document.getElementById('splash-status');
-      const splashScreen = document.getElementById('splash-screen');
-
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 4;
-        if (progress > 100) progress = 100;
-        progressBar.style.width = `${progress}%`;
-        percentText.innerText = `${progress}%`;
-
-        if (progress === 40) statusText.innerText = "VERIFYING CLOUD NODE...";
-        if (progress === 80) statusText.innerText = "SYNCHRONIZING BLUEPRINTS...";
-
-        if (progress >= 100) {
-          clearInterval(interval);
-          setTimeout(() => {
-            splashScreen.style.opacity = '0';
-            setTimeout(() => {
-              splashScreen.style.display = 'none';
-            }, 700);
-          }, 200);
-        }
-      }, 50);
-    });
-
-    // Owner Login Functions
     window.openAuthModal = function() {
       if (isOwnerLoggedIn) {
         isOwnerLoggedIn = false;
         updateRoleUI();
-        renderProjects();
         return;
       }
       document.getElementById('auth-modal').classList.remove('hidden');
       document.getElementById('passcode-input').value = '';
       document.getElementById('auth-error').classList.add('hidden');
-    };
+    }
 
     window.closeAuthModal = function() {
       document.getElementById('auth-modal').classList.add('hidden');
-    };
+    }
 
     window.verifyPasscode = function() {
       const input = document.getElementById('passcode-input').value.trim();
@@ -354,11 +48,10 @@
         isOwnerLoggedIn = true;
         closeAuthModal();
         updateRoleUI();
-        renderProjects();
       } else {
         document.getElementById('auth-error').classList.remove('hidden');
       }
-    };
+    }
 
     function updateRoleUI() {
       const roleBadge = document.getElementById('role-badge');
@@ -368,158 +61,178 @@
       if (isOwnerLoggedIn) {
         roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center gap-1.5";
         roleBadge.innerHTML = '<i class="fa-solid fa-user-check text-cyan-400"></i><span>OWNER MODE</span>';
-        
         authBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>LOGOUT</span>';
         authBtn.className = "px-3 py-1.5 rounded-lg text-xs font-orbitron font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-all";
-        
         publishBtn.classList.remove('hidden');
       } else {
         roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5";
         roleBadge.innerHTML = '<i class="fa-solid fa-user-shield text-slate-400"></i><span>VIEWER MODE</span>';
-        
         authBtn.innerHTML = '<i class="fa-solid fa-lock"></i><span>OWNER LOGIN</span>';
         authBtn.className = "px-4 py-2 rounded-lg text-xs font-orbitron font-bold tracking-wider bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 transition-all flex items-center gap-2";
-        
         publishBtn.classList.add('hidden');
       }
+      loadProjects();
     }
 
-    // Modal Control Functions
     window.openPublishModal = function() {
       if (!isOwnerLoggedIn) return;
       document.getElementById('publish-modal').classList.remove('hidden');
-    };
+    }
 
     window.closePublishModal = function() {
       document.getElementById('publish-modal').classList.add('hidden');
       document.getElementById('publish-form').reset();
-    };
+    }
 
-    // Global Database Write Action
     window.handlePublish = async function(e) {
       e.preventDefault();
-      if (!isOwnerLoggedIn) return;
-
-      const submitBtn = document.getElementById('submit-publish-btn');
-      submitBtn.innerText = "SAVING TO DATABASE...";
-      submitBtn.disabled = true;
-
       const title = document.getElementById('build-title').value;
       const category = document.getElementById('build-category').value;
       const description = document.getElementById('build-description').value;
       const pdfUrl = document.getElementById('build-pdf-url').value;
 
       try {
-        const publicColRef = collection(db, 'artifacts', appId, 'public', 'data', 'projects');
-        await addDoc(publicColRef, {
+        await addDoc(collection(db, "projects"), {
           title,
           category,
           description,
           pdfUrl,
-          createdAt: new Date().toISOString(),
-          date: new Date().toLocaleDateString()
+          createdAt: Date.now()
         });
-
         closePublishModal();
       } catch (err) {
-        console.error("Error adding project to cloud:", err);
-      } finally {
-        submitBtn.innerText = "PUBLISH TO WORLD";
-        submitBtn.disabled = false;
+        alert("Error publishing project to cloud database.");
       }
-    };
+    }
 
-    // Delete Project from Cloud
     window.deleteProject = async function(id) {
       if (!isOwnerLoggedIn) return;
-      try {
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'projects', id);
-        await deleteDoc(docRef);
-      } catch (err) {
-        console.error("Error deleting project:", err);
+      if (confirm("Are you sure you want to delete this build?")) {
+        try {
+          await deleteDoc(doc(db, "projects", id));
+        } catch (err) {
+          alert("Error deleting project.");
+        }
       }
-    };
+    }
 
-    // Render Projects List
-    function renderProjects() {
+    async function loadProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
 
-      let filtered = publishedProjects;
-      if (currentCategoryFilter !== 'ALL') {
-        filtered = publishedProjects.filter(p => p.category === currentCategoryFilter);
-      }
-
-      if (filtered.length === 0) {
-        container.innerHTML = '';
-        container.appendChild(emptyState);
-        emptyState.classList.remove('hidden');
-        return;
-      }
-
-      container.innerHTML = '';
-      filtered.forEach(proj => {
-        const card = document.createElement('div');
-        card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";
-        card.innerHTML = `
-          <div>
-            <div class="flex justify-between items-start mb-3">
-              <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${proj.category}</span>
-              <div class="flex items-center gap-2">
-                <span class="text-[10px] font-mono text-slate-500">${proj.date || ''}</span>
-                ${isOwnerLoggedIn ? `
-                  <button onclick="deleteProject('${proj.id}')" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
-                    <i class="fa-solid fa-trash"></i>
-                  </button>
-                ` : ''}
+      try {
+        const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
+        onSnapshot(q, (snapshot) => {
+          container.innerHTML = '';
+          if (snapshot.empty) {
+            container.appendChild(emptyState);
+            emptyState.classList.remove('hidden');
+            return;
+          }
+          
+          snapshot.forEach((docSnap) => {
+            const proj = docSnap.id;
+            const data = docSnap.data();
+            
+            const card = document.createElement('div');
+            card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";
+            card.innerHTML = `
+              <div>
+                <div class="flex justify-between items-start mb-3">
+                  <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${data.category}</span>
+                  ${isOwnerLoggedIn ? `
+                    <button onclick="deleteProject('${docSnap.id}')" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  ` : ''}
+                </div>
+                <h3 class="font-orbitron font-bold text-base text-white mb-2">${data.title}</h3>
+                <p class="text-xs text-slate-300 mb-6 leading-relaxed">${data.description}</p>
               </div>
-            </div>
-            <h3 class="font-orbitron font-bold text-base text-white mb-2">${proj.title}</h3>
-            <p class="text-xs text-slate-300 mb-6 leading-relaxed">${proj.description}</p>
-          </div>
-
-          <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
-            <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono overflow-hidden">
-              <i class="fa-solid fa-link text-cyan-400"></i>
-              <span class="truncate max-w-[140px] text-[11px]">${proj.pdfUrl}</span>
-            </div>
-
-            <div class="flex items-center gap-2">
-              <button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
-                <i class="fa-solid fa-eye"></i> VIEW
-              </button>
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-      });
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                <span class="text-[10px] font-mono text-slate-500">CLOUD SYNCED</span>
+                <a href="${data.pdfUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-file-pdf"></i> VIEW PDF
+                </a>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        });
+      } catch (err) {
+        console.error(err);
+      }
     }
 
-    // Modal PDF Viewer
-    window.openPdfModal = function(url, title) {
-      if (!url) return;
-      document.getElementById('pdf-modal').classList.remove('hidden');
-      document.getElementById('pdf-modal-title').innerText = title.toUpperCase();
-      document.getElementById('pdf-frame').src = url;
-      const downloadBtn = document.getElementById('pdf-modal-download');
-      downloadBtn.href = url;
-    };
-
-    window.closePdfModal = function() {
-      document.getElementById('pdf-modal').classList.add('hidden');
-      document.getElementById('pdf-frame').src = '';
-    };
-
-    // Category Filter Buttons Handler
-    window.filterCategory = function(cat) {
-      currentCategoryFilter = cat;
-      const buttons = document.querySelectorAll('.cat-btn');
-      buttons.forEach(btn => {
-        btn.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700";
-      });
-      event.target.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/50";
-      renderProjects();
-    };
+    window.addEventListener('DOMContentLoaded', () => {
+      loadProjects();
+    });
   </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&display=swap');
+    body { font-family: 'Rajdhani', sans-serif; background-color: #05070a; color: #e2e8f0; }
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .glass-card { background: rgba(13, 18, 28, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(6, 182, 212, 0.15); }
+    .modal-backdrop { background: rgba(3, 7, 18, 0.85); backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+  <!-- NAVBAR -->
+  <header class="border-b border-slate-800 bg-[#070b12]/80 backdrop-blur-md sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <span class="font-orbitron text-lg font-black tracking-wider text-white">ANOMUS<span class="text-cyan-400">.PRO</span></span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
+          <i class="fa-solid fa-user-shield"></i><span>VIEWER MODE</span>
+        </div>
+        <button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold bg-slate-800 text-cyan-400 border border-cyan-500/30">OWNER LOGIN</button>
+        <button id="publish-btn" onclick="openPublishModal()" class="hidden px-4 py-2 rounded-lg text-xs font-orbitron font-bold bg-cyan-500 text-slate-950">PUBLISH BUILD</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="max-w-7xl mx-auto px-4 py-10 flex-grow w-full">
+    <div class="mb-10 text-center max-w-3xl mx-auto">
+      <h1 class="font-orbitron text-3xl font-extrabold text-white mb-3">HARDWARE & ROBOTICS <span class="text-cyan-400">BLUEPRINTS</span></h1>
+    </div>
+    <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800">
+        <h3 class="font-orbitron text-lg font-bold text-white mb-1">NO PUBLISHED BUILDS YET</h3>
+      </div>
+    </div>
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/30">
+      <h3 class="font-orbitron font-bold text-white text-sm mb-4">OWNER ACCESS VERIFICATION</h3>
+      <input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 outline-none" />
+      <p id="auth-error" class="text-red-400 text-[11px] font-mono hidden mb-3">Invalid passcode.</p>
+      <button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">VERIFY</button>
+    </div>
+  </div>
+
+  <!-- PUBLISH MODAL -->
+  <div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-xl w-full border border-cyan-500/30">
+      <h3 class="font-orbitron font-bold text-white text-base mb-6">PUBLISH HARDWARE BUILD</h3>
+      <form id="publish-form" onsubmit="handlePublish(event)" class="space-y-4">
+        <input type="text" id="build-title" required placeholder="Build Title" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
+        <select id="build-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 outline-none">
+          <option value="ROBOTICS">ROBOTICS</option>
+          <option value="CIRCUITRY">CIRCUITRY</option>
+          <option value="IOT">IOT HARDWARE</option>
+        </select>
+        <textarea id="build-description" required rows="3" placeholder="Description..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none"></textarea>
+        <input type="url" id="build-pdf-url" required placeholder="Public PDF Link (e.g. Google Drive or GitHub file link)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">PUBLISH TO CLOUD</button>
+      </form>
+    </div>
+  </div>
+
 </body>
 </html>
