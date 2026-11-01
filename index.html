@@ -11,25 +11,21 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-    // PASTE YOUR COMPLETE FIREBASE CONFIG KEYS HERE
     const firebaseConfig = {
-      apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_P95iTUc",
+      apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_95iTUc",
       authDomain: "anomus-pro.firebaseapp.com",
       projectId: "anomus-pro",
-      storageBucket: "anomus-pro.firebasestorage.app",
-      messagingSenderId: "573201820218",
-      appId: "1:573201820218:web:b110e43cebf7a084c82303"
+      storageBucket: "anomus-pro.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
     let isOwnerLoggedIn = false;
-    let selectedPdfFile = null;
 
     window.openAuthModal = function() {
       if (isOwnerLoggedIn) {
@@ -86,90 +82,32 @@
     window.closePublishModal = function() {
       document.getElementById('publish-modal').classList.add('hidden');
       document.getElementById('publish-form').reset();
-      document.getElementById('file-label').innerText = "Click to choose PDF file";
-      document.getElementById('upload-progress-box').classList.add('hidden');
-      document.getElementById('file-error').classList.add('hidden');
-      selectedPdfFile = null;
-    }
-
-    window.handleFileSelect = function(e) {
-      const file = e.target.files[0];
-      const maxMb = 100;
-
-      if (file) {
-        if (file.size > maxMb * 1024 * 1024) {
-          document.getElementById('file-error').classList.remove('hidden');
-          e.target.value = '';
-          selectedPdfFile = null;
-          document.getElementById('file-label').innerText = "Click to choose PDF file";
-        } else {
-          document.getElementById('file-error').classList.add('hidden');
-          selectedPdfFile = file;
-          const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-          document.getElementById('file-label').innerText = `${file.name} (${sizeMb} MB)`;
-        }
-      }
     }
 
     window.handlePublish = async function(e) {
       e.preventDefault();
-      if (!selectedPdfFile) {
-        alert("Please select a PDF file to upload.");
-        return;
-      }
-
       const title = document.getElementById('build-title').value;
       const category = document.getElementById('build-category').value;
       const description = document.getElementById('build-description').value;
+      const pdfUrl = document.getElementById('build-pdf-url').value;
 
-      const progressBox = document.getElementById('upload-progress-box');
-      const progressBar = document.getElementById('upload-progress-bar');
-      const progressPercent = document.getElementById('upload-progress-percent');
-      const publishSubmitBtn = document.getElementById('publish-submit-btn');
-
-      progressBox.classList.remove('hidden');
-      publishSubmitBtn.disabled = true;
-
-      // Create a unique file reference in Firebase Storage
-      const storageRef = ref(storage, `pdfs/${Date.now()}_${selectedPdfFile.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, selectedPdfFile);
-
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
-          progressBar.style.width = `${progress}%`;
-          progressPercent.innerText = `${progress}%`;
-        }, 
-        (error) => {
-          console.error(error);
-          alert("Error uploading PDF to Cloud Storage. Make sure Storage is enabled in test mode.");
-          publishSubmitBtn.disabled = false;
-          progressBox.classList.add('hidden');
-        }, 
-        async () => {
-          // Upload complete, get public URL from Firebase Storage
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          
-          // Save project data to Firestore
-          await addDoc(collection(db, "projects"), {
-            title,
-            category,
-            description,
-            pdfUrl: downloadURL,
-            pdfName: selectedPdfFile.name,
-            pdfSize: (selectedPdfFile.size / (1024 * 1024)).toFixed(2),
-            createdAt: Date.now()
-          });
-
-          publishSubmitBtn.disabled = false;
-          closePublishModal();
-        }
-      );
+      try {
+        await addDoc(collection(db, "projects"), {
+          title,
+          category,
+          description,
+          pdfUrl,
+          createdAt: Date.now()
+        });
+        closePublishModal();
+      } catch (err) {
+        alert("Error publishing project to cloud database.");
+      }
     }
 
     window.deleteProject = async function(id) {
       if (!isOwnerLoggedIn) return;
-      if (confirm("Are you sure you want to delete this build from cloud storage?")) {
+      if (confirm("Are you sure you want to delete this build?")) {
         try {
           await deleteDoc(doc(db, "projects", id));
         } catch (err) {
@@ -210,12 +148,8 @@
                 <h3 class="font-orbitron font-bold text-base text-white mb-2">${data.title}</h3>
                 <p class="text-xs text-slate-300 mb-6 leading-relaxed">${data.description}</p>
               </div>
-              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                <div class="flex items-center gap-1.5 text-xs text-slate-400 font-mono overflow-hidden">
-                  <i class="fa-solid fa-file-pdf text-cyan-400"></i>
-                  <span class="truncate max-w-[120px]">${data.pdfName || 'Blueprint.pdf'}</span>
-                  ${data.pdfSize ? `<span class="text-[10px] text-slate-600">(${data.pdfSize} MB)</span>` : ''}
-                </div>
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
+                <span class="text-[10px] font-mono text-slate-500">CLOUD SYNCED</span>
                 <a href="${data.pdfUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
                   <i class="fa-solid fa-file-pdf"></i> VIEW PDF
                 </a>
@@ -281,55 +215,20 @@
     </div>
   </div>
 
-  <!-- PUBLISH MODAL WITH FILE UPLOAD -->
+  <!-- PUBLISH MODAL -->
   <div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl p-6 max-w-xl w-full border border-cyan-500/30">
       <h3 class="font-orbitron font-bold text-white text-base mb-6">PUBLISH HARDWARE BUILD</h3>
       <form id="publish-form" onsubmit="handlePublish(event)" class="space-y-4">
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">BUILD TITLE *</label>
-          <input type="text" id="build-title" required placeholder="Build Title" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
-        </div>
-
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">CATEGORY *</label>
-          <select id="build-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 outline-none">
-            <option value="ROBOTICS">ROBOTICS</option>
-            <option value="CIRCUITRY">CIRCUITRY</option>
-            <option value="IOT">IOT HARDWARE</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">DESCRIPTION *</label>
-          <textarea id="build-description" required rows="3" placeholder="Description..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none"></textarea>
-        </div>
-
-        <!-- DIRECT PDF FILE INPUT -->
-        <div>
-          <label class="block text-xs font-mono text-slate-400 mb-1">ATTACH PDF FILE (UP TO 100 MB) *</label>
-          <div class="border-2 border-dashed border-slate-800 rounded-xl p-4 text-center bg-slate-950/50 hover:border-cyan-500/50 transition-colors">
-            <input type="file" id="build-pdf" accept="application/pdf" required onchange="handleFileSelect(event)" class="hidden" />
-            <label for="build-pdf" class="cursor-pointer flex flex-col items-center">
-              <i class="fa-solid fa-file-pdf text-2xl text-cyan-400 mb-1"></i>
-              <span id="file-label" class="text-xs text-slate-300 font-mono">Click to choose PDF file</span>
-            </label>
-          </div>
-          <p id="file-error" class="text-red-400 text-[11px] font-mono hidden mt-1"><i class="fa-solid fa-circle-exclamation"></i> File exceeds 100 MB limit.</p>
-        </div>
-
-        <!-- UPLOAD PROGRESS BAR -->
-        <div id="upload-progress-box" class="hidden space-y-1">
-          <div class="flex justify-between text-xs font-mono text-slate-400">
-            <span>UPLOADING TO FIREBASE...</span>
-            <span id="upload-progress-percent">0%</span>
-          </div>
-          <div class="w-full bg-slate-900 h-2 rounded-full overflow-hidden border border-slate-800">
-            <div id="upload-progress-bar" class="bg-cyan-500 h-full w-0 transition-all duration-150"></div>
-          </div>
-        </div>
-
-        <button type="submit" id="publish-submit-btn" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs shadow-lg shadow-cyan-500/20">PUBLISH TO CLOUD</button>
+        <input type="text" id="build-title" required placeholder="Build Title" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
+        <select id="build-category" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-300 outline-none">
+          <option value="ROBOTICS">ROBOTICS</option>
+          <option value="CIRCUITRY">CIRCUITRY</option>
+          <option value="IOT">IOT HARDWARE</option>
+        </select>
+        <textarea id="build-description" required rows="3" placeholder="Description..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none"></textarea>
+        <input type="url" id="build-pdf-url" required placeholder="Public PDF Link (e.g., Google Drive share link)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">PUBLISH TO CLOUD</button>
       </form>
     </div>
   </div>
