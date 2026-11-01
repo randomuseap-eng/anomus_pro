@@ -268,8 +268,27 @@
     let publishedProjects = [];
     let selectedPdfFile = null;
 
+    // --- LOAD PROJECTS FROM LOCALSTORAGE ON START ---
+    function loadSavedProjects() {
+      const saved = localStorage.getItem('anomus_projects');
+      if (saved) {
+        try {
+          publishedProjects = JSON.parse(saved);
+        } catch (e) {
+          publishedProjects = [];
+        }
+      }
+    }
+
+    function saveProjectsToStorage() {
+      localStorage.setItem('anomus_projects', JSON.stringify(publishedProjects));
+    }
+
     // --- 1. SPLASH SCREEN ANIMATION (5 SECONDS) ---
     window.addEventListener('DOMContentLoaded', () => {
+      loadSavedProjects();
+      renderProjects(publishedProjects);
+
       const progressBar = document.getElementById('splash-progress');
       const percentText = document.getElementById('splash-percent');
       const statusText = document.getElementById('splash-status');
@@ -293,13 +312,12 @@
             }, 700);
           }, 300);
         }
-      }, 90); // ~5 seconds duration
+      }, 90);
     });
 
     // --- 2. AUTHENTICATION & ACCESS CONTROL ---
     function openAuthModal() {
       if (isOwnerLoggedIn) {
-        // Logout if already logged in
         isOwnerLoggedIn = false;
         updateRoleUI();
         renderProjects(publishedProjects);
@@ -391,7 +409,6 @@
       const category = document.getElementById('build-category').value;
       const description = document.getElementById('build-description').value;
 
-      // Create browser Blob URL for session PDF access
       const pdfUrl = URL.createObjectURL(selectedPdfFile);
 
       const newProject = {
@@ -406,6 +423,7 @@
       };
 
       publishedProjects.unshift(newProject);
+      saveProjectsToStorage();
       renderProjects(publishedProjects);
       closePublishModal();
     }
@@ -414,6 +432,7 @@
     function deleteProject(id) {
       if (!isOwnerLoggedIn) return;
       publishedProjects = publishedProjects.filter(p => p.id !== id);
+      saveProjectsToStorage();
       renderProjects(publishedProjects);
     }
 
@@ -458,12 +477,11 @@
             </div>
 
             <div class="flex items-center gap-2">
-              <button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}', '${proj.pdfName}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
-                <i class="fa-solid fa-eye"></i> VIEW
-              </button>
-              <a href="${proj.pdfUrl}" download="${proj.pdfName}" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono transition-all flex items-center gap-1">
-                <i class="fa-solid fa-download"></i>
-              </a>
+              ${proj.pdfUrl ? `
+                <button onclick="openPdfModal('${proj.pdfUrl}', '${proj.title}', '${proj.pdfName}')" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
+                  <i class="fa-solid fa-eye"></i> VIEW
+                </button>
+              ` : ''}
             </div>
           </div>
         `;
@@ -473,6 +491,7 @@
 
     // --- 6. PDF VIEWER MODAL FOR CUSTOMERS ---
     function openPdfModal(url, title, filename) {
+      if (!url) return;
       document.getElementById('pdf-modal').classList.remove('hidden');
       document.getElementById('pdf-modal-title').innerText = title.toUpperCase();
       document.getElementById('pdf-frame').src = url;
@@ -488,7 +507,6 @@
 
     // --- 7. CATEGORY FILTER ---
     function filterCategory(cat) {
-      // Update UI active state
       document.querySelectorAll('.cat-btn').forEach(btn => {
         btn.className = "cat-btn px-4 py-1.5 rounded-full text-xs font-mono bg-slate-900 text-slate-400 border border-slate-800 hover:border-slate-700";
       });
