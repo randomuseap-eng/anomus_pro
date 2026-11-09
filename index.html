@@ -7,22 +7,25 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs for Projects Database -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, runTransaction } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_95iTUc",
       authDomain: "anomus-pro.firebaseapp.com",
       projectId: "anomus-pro",
-      storageBucket: "anomus-pro.appspot.com",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      storageBucket: "anomus-pro.appspot.com"
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    let db;
+    try {
+      const app = initializeApp(firebaseConfig);
+      db = getFirestore(app);
+    } catch (e) {
+      console.error("Firebase init error:", e);
+    }
 
     const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
     let isOwnerLoggedIn = false;
@@ -49,7 +52,7 @@
         closeAuthModal();
         updateRoleUI();
       } else {
-        document.getElementById('auth-error').classList.remove('hidden');
+        document.getElementById('auth-error').classList.add('hidden');
       }
     }
 
@@ -86,6 +89,7 @@
 
     window.handlePublish = async function(e) {
       e.preventDefault();
+      if (!db) return alert("Database not connected.");
       const title = document.getElementById('build-title').value;
       const category = document.getElementById('build-category').value;
       const description = document.getElementById('build-description').value;
@@ -106,7 +110,7 @@
     }
 
     window.deleteProject = async function(id) {
-      if (!isOwnerLoggedIn) return;
+      if (!isOwnerLoggedIn || !db) return;
       if (confirm("Are you sure you want to delete this build?")) {
         try {
           await deleteDoc(doc(db, "projects", id));
@@ -116,35 +120,10 @@
       }
     }
 
-    // --- VISITOR COUNTER LOGIC ---
-    async function trackVisitor() {
-      const statsRef = doc(db, "analytics", "site_stats");
-      try {
-        await runTransaction(db, async (transaction) => {
-          const statsDoc = await transaction.get(statsRef);
-          if (!statsDoc.exists()) {
-            transaction.set(statsRef, { views: 1 });
-          } else {
-            const newViews = (statsDoc.data().views || 0) + 1;
-            transaction.update(statsRef, { views: newViews });
-          }
-        });
-
-        onSnapshot(statsRef, (docSnap) => {
-          if (docSnap.exists()) {
-            const count = docSnap.data().views || 0;
-            document.getElementById('visitor-count').innerText = count.toLocaleString();
-          }
-        });
-      } catch (err) {
-        console.error("Error updating visitor count: ", err);
-        document.getElementById('visitor-count').innerText = "1+";
-      }
-    }
-
     async function loadProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
+      if (!container || !db) return;
 
       try {
         const q = query(collection(db, "projects"), orderBy("createdAt", "desc"));
@@ -188,6 +167,32 @@
       }
     }
 
+    // --- SESSION-AWARE VISITOR COUNTER ---
+    async function trackVisitor() {
+      const counterEl = document.getElementById('visitor-count');
+      try {
+        const hasVisited = sessionStorage.getItem('anomus_session_visited');
+        let endpoint = 'https://api.countapi.xyz/get/anomuspro-platform/visits';
+
+        if (!hasVisited) {
+          endpoint = 'https://api.countapi.xyz/hit/anomuspro-platform/visits';
+          sessionStorage.setItem('anomus_session_visited', 'true');
+        }
+
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        counterEl.innerText = data.value.toLocaleString();
+      } catch (err) {
+        let views = localStorage.getItem('site_views') || 120;
+        if (!sessionStorage.getItem('anomus_session_visited')) {
+          views = parseInt(views) + 1;
+          localStorage.setItem('site_views', views);
+          sessionStorage.setItem('anomus_session_visited', 'true');
+        }
+        counterEl.innerText = views.toLocaleString();
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       loadProjects();
       trackVisitor();
@@ -210,10 +215,10 @@
         <span class="font-orbitron text-lg font-black tracking-wider text-white">ANOMUS<span class="text-cyan-400">.PRO</span></span>
       </div>
 
-      <!-- VISITOR COUNT BADGE (CENTERED IN NAVBAR) -->
+      <!-- VISITOR COUNT BADGE -->
       <div class="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 shadow-lg shadow-cyan-500/10">
         <i class="fa-solid fa-eye text-cyan-400 animate-pulse"></i>
-        <span>VIEWS: <strong id="visitor-count" class="text-white">0</strong></span>
+        <span>VIEWS: <strong id="visitor-count" class="text-white">...</strong></span>
       </div>
 
       <div class="flex items-center gap-3">
