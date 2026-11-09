@@ -10,7 +10,7 @@
   <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, runTransaction, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_95iTUc",
@@ -116,6 +116,33 @@
       }
     }
 
+    // --- VISITOR COUNTER LOGIC ---
+    async function trackVisitor() {
+      const statsRef = doc(db, "analytics", "site_stats");
+      try {
+        // Increment visitor count safely using a Firestore transaction
+        await runTransaction(db, async (transaction) => {
+          const statsDoc = await transaction.get(statsRef);
+          if (!statsDoc.exists()) {
+            transaction.set(statsRef, { views: 1 });
+          } else {
+            const newViews = (statsDoc.data().views || 0) + 1;
+            transaction.update(statsRef, { views: newViews });
+          }
+        });
+
+        // Listen in real-time to display updated count
+        onSnapshot(statsRef, (docSnap) => {
+          if (docSnap.exists()) {
+            const count = docSnap.data().views || 0;
+            document.getElementById('visitor-count').innerText = count.toLocaleString();
+          }
+        });
+      } catch (err) {
+        console.error("Error updating visitor count: ", err);
+      }
+    }
+
     async function loadProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
@@ -165,6 +192,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       loadProjects();
+      trackVisitor();
     });
   </script>
   <style>
@@ -184,6 +212,12 @@
         <span class="font-orbitron text-lg font-black tracking-wider text-white">ANOMUS<span class="text-cyan-400">.PRO</span></span>
       </div>
       <div class="flex items-center gap-3">
+        <!-- VISITOR BADGE IN NAVBAR -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-slate-900/80 text-cyan-400 border border-cyan-500/20">
+          <i class="fa-solid fa-eye text-cyan-400 animate-pulse"></i>
+          <span>VIEWS: <strong id="visitor-count" class="text-white">...</strong></span>
+        </div>
+        
         <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
           <i class="fa-solid fa-user-shield"></i><span>VIEWER MODE</span>
         </div>
@@ -216,9 +250,18 @@
           <p class="text-xs font-mono text-slate-500">ANOMUS PRO &copy; 2026. ALL RIGHTS RESERVED.</p>
         </div>
       </div>
-      <a href="https://www.youtube.com/@anomuspro" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-orbitron font-bold transition-all flex items-center gap-2.5 shadow-lg shadow-red-500/10">
-        <i class="fa-brands fa-youtube text-base"></i> FOLLOW US ON YOUTUBE
-      </a>
+      
+      <div class="flex items-center gap-4 flex-wrap justify-center">
+        <!-- VISITOR BADGE IN FOOTER -->
+        <div class="flex sm:hidden items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-slate-900/80 text-cyan-400 border border-cyan-500/20">
+          <i class="fa-solid fa-eye text-cyan-400 animate-pulse"></i>
+          <span>VIEWS: <strong id="visitor-count-mobile" class="text-white">...</strong></span>
+        </div>
+
+        <a href="https://www.youtube.com/@anomuspro" target="_blank" rel="noopener noreferrer" class="px-5 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-orbitron font-bold transition-all flex items-center gap-2.5 shadow-lg shadow-red-500/10">
+          <i class="fa-brands fa-youtube text-base"></i> FOLLOW US ON YOUTUBE
+        </a>
+      </div>
     </div>
   </footer>
 
@@ -245,7 +288,7 @@
         </select>
         <textarea id="build-description" required rows="3" placeholder="Description..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none"></textarea>
         <input type="url" id="build-pdf-url" required placeholder="Public PDF Link (e.g., Google Drive share link)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
-        <button type="submit" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">PUBLISH TO CLOUD</button>
+        <button type="submit" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">PUBLISH TO CLOUD</>
       </form>
     </div>
   </div>
