@@ -7,7 +7,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
-  <!-- Firebase SDKs for Projects Database -->
+  <!-- Firebase SDKs for Projects & Reviews Database -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -29,7 +29,43 @@
 
     const PERMANENT_OWNER_CODE = "ACESS_OWNER_AP+ADMIN_UniQue";
     let isOwnerLoggedIn = false;
+    let currentReviewProjectId = null;
+    let selectedStarRating = 5;
+    let unsubscribeReviews = null;
 
+    // --- PROFANITY / BAD WORD FILTER ---
+    // Add any extra words you want to block inside this list (keep lowercase)
+    const BANNED_WORDS = [
+      "fuck", "shit", "bitch", "asshole", "bastard", "dick", "pussy",
+      "cunt", "slut", "whore", "nigger", "nigga", "faggot", "retard",
+      "motherfucker", "bullshit", "crap", "damn", "idiot", "stupid",
+      "moron", "dumbass", "scam", "fake", "trash"
+    ];
+
+    function containsBadWord(text) {
+      if (!text) return false;
+      // Normalize text: lowercase, replace common symbol substitutions (@->a, 1->i, 0->o, $->s, 3->e)
+      const normalized = text
+        .toLowerCase()
+        .replace(/@/g, 'a')
+        .replace(/1/g, 'i')
+        .replace(/!/g, 'i')
+        .replace(/0/g, 'o')
+        .replace(/\$/g, 's')
+        .replace(/3/g, 'e');
+
+      // Check word-by-word and stripped-spaces version (catches "f u c k")
+      const words = normalized.split(/[^a-z]+/).filter(Boolean);
+      const squashed = normalized.replace(/[^a-z]/g, '');
+
+      for (const bad of BANNED_WORDS) {
+        if (words.includes(bad)) return true;
+        if (bad.length >= 4 && squashed.includes(bad)) return true;
+      }
+      return false;
+    }
+
+    // --- AUTH MODAL LOGIC ---
     window.openAuthModal = function() {
       if (isOwnerLoggedIn) {
         isOwnerLoggedIn = false;
@@ -52,7 +88,7 @@
         closeAuthModal();
         updateRoleUI();
       } else {
-        document.getElementById('auth-error').classList.add('hidden');
+        document.getElementById('auth-error').classList.remove('hidden');
       }
     }
 
@@ -65,7 +101,7 @@
         roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 flex items-center gap-1.5";
         roleBadge.innerHTML = '<i class="fa-solid fa-user-check text-cyan-400"></i><span>OWNER MODE</span>';
         authBtn.innerHTML = '<i class="fa-solid fa-right-from-bracket"></i><span>LOGOUT</span>';
-        authBtn.className = "px-3 py-1.5 rounded-lg text-xs font-orbitron font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-all";
+        authBtn.className = "px-3 py-1.5 rounded-lg text-xs font-orbitron font-bold bg-slate-900 text-slate-400 hover:text-white border border-slate-800 transition-all flex items-center gap-1.5";
         publishBtn.classList.remove('hidden');
       } else {
         roleBadge.className = "px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5";
@@ -77,6 +113,7 @@
       loadProjects();
     }
 
+    // --- PUBLISH MODAL LOGIC ---
     window.openPublishModal = function() {
       if (!isOwnerLoggedIn) return;
       document.getElementById('publish-modal').classList.remove('hidden');
@@ -105,7 +142,7 @@
         });
         closePublishModal();
       } catch (err) {
-        alert("Error publishing project to cloud database.");
+        alert("Error publishing project. Check Firestore write rules.");
       }
     }
 
@@ -120,6 +157,153 @@
       }
     }
 
+    // --- GOOGLE-STYLE REVIEWS & COMMENTS MODAL LOGIC ---
+    window.setRating = function(stars) {
+      selectedStarRating = stars;
+      const starBtns = document.querySelectorAll('#star-selector button');
+      starBtns.forEach((btn, idx) => {
+        if (idx < stars) {
+          btn.classList.remove('text-slate-600');
+          btn.classList.add('text-amber-400');
+        } else {
+          btn.classList.remove('text-amber-400');
+          btn.classList.add('text-slate-600');
+        }
+      });
+    }
+
+    window.openReviewModal = function(projectId, projectTitle) {
+      currentReviewProjectId = projectId;
+      document.getElementById('review-project-title').innerText = projectTitle;
+      document.getElementById('review-modal').classList.remove('hidden');
+      document.getElementById('profanity-warning').classList.add('hidden');
+      document.getElementById('review-form').reset();
+      setRating(5);
+
+      const listEl = document.getElementById('reviews-list');
+      const avgEl = document.getElementById('modal-avg-rating');
+      listEl.innerHTML = '<p class="text-xs font-mono text-slate-500 text-center py-4">Loading reviews...</p>';
+
+      if (unsubscribeReviews) unsubscribeReviews();
+
+      const reviewsRef = collection(db, "projects", projectId, "reviews");
+      const q = query(reviewsRef, orderBy("createdAt", "desc"));
+
+      unsubscribeReviews = onSnapshot(q, (snapshot) => {
+        listEl.innerHTML = '';
+        if (snapshot.empty) {
+          avgEl.innerHTML = '<span class="text-slate-400 text-xs font-mono">No ratings yet — be the first!</span>';
+          listEl.innerHTML = '<p class="text-xs font-mono text-slate-500 text-center py-6">No reviews posted for this build yet.</p>';
+          return;
+        }
+
+        let totalStars = 0;
+        let count = 0;
+
+        snapshot.forEach((revDoc) => {
+          const r = revDoc.data();
+          totalStars += Number(r.rating || 5);
+          count++;
+
+          const starsHtml = Array.from({ length: 5 }, (_, i) =>
+            `<i class="fa-solid fa-star text-[11px] ${i < r.rating ? 'text-amber-400' : 'text-slate-700'}"></i>`
+          ).join('');
+
+          const dateStr = r.createdAt ? new Date(r.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+          const item = document.createElement('div');
+          item.className = "bg-slate-950/80 border border-slate-800/80 rounded-xl p-3.5";
+          item.innerHTML = `
+            <div class="flex items-center justify-between mb-1.5">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-[11px] font-orbitron font-bold text-cyan-400">
+                  ${escapeHtml(r.name || 'A').charAt(0).toUpperCase()}
+                </div>
+                <span class="text-xs font-bold text-white">${escapeHtml(r.name || 'Anonymous Maker')}</span>
+              </div>
+              <span class="text-[10px] font-mono text-slate-500">${dateStr}</span>
+            </div>
+            <div class="flex items-center gap-1 mb-2">${starsHtml}</div>
+            <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(r.comment)}</p>
+          `;
+          listEl.appendChild(item);
+        });
+
+        const avg = (totalStars / count).toFixed(1);
+        avgEl.innerHTML = `
+          <span class="text-xl font-orbitron font-extrabold text-white">${avg}</span>
+          <div class="flex items-center gap-0.5 text-amber-400 text-xs">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <span class="text-xs font-mono text-slate-400">(${count} ${count === 1 ? 'review' : 'reviews'})</span>
+        `;
+      });
+    }
+
+    window.closeReviewModal = function() {
+      document.getElementById('review-modal').classList.add('hidden');
+      if (unsubscribeReviews) {
+        unsubscribeReviews();
+        unsubscribeReviews = null;
+      }
+      currentReviewProjectId = null;
+    }
+
+    window.submitReview = async function(e) {
+      e.preventDefault();
+      if (!db || !currentReviewProjectId) return;
+
+      const nameInput = document.getElementById('reviewer-name').value.trim();
+      const commentInput = document.getElementById('reviewer-comment').value.trim();
+      const warningEl = document.getElementById('profanity-warning');
+
+      // Block message if bad words are detected in name or comment
+      if (containsBadWord(nameInput) || containsBadWord(commentInput)) {
+        warningEl.classList.remove('hidden');
+        return;
+      }
+      warningEl.classList.add('hidden');
+
+      const submitBtn = document.getElementById('submit-review-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "POSTING...";
+
+      try {
+        await addDoc(collection(db, "projects", currentReviewProjectId, "reviews"), {
+          name: nameInput || "Maker",
+          rating: selectedStarRating,
+          comment: commentInput,
+          createdAt: Date.now()
+        });
+        document.getElementById('review-form').reset();
+        setRating(5);
+      } catch (err) {
+        alert("Could not post review. Check Firestore rules for the reviews subcollection.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "POST REVIEW";
+      }
+    }
+
+    // Live check while typing to hide warning once cleaned
+    window.checkLiveInput = function() {
+      const nameInput = document.getElementById('reviewer-name').value;
+      const commentInput = document.getElementById('reviewer-comment').value;
+      const warningEl = document.getElementById('profanity-warning');
+      if (!containsBadWord(nameInput) && !containsBadWord(commentInput)) {
+        warningEl.classList.add('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
+    }
+
+    // --- LOAD PROJECTS & LIVE RATING SUMMARY ---
     async function loadProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
@@ -137,29 +321,52 @@
           
           snapshot.forEach((docSnap) => {
             const data = docSnap.data();
+            const projectId = docSnap.id;
+            const safeTitle = escapeHtml(data.title);
             const card = document.createElement('div');
             card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";
             card.innerHTML = `
               <div>
                 <div class="flex justify-between items-start mb-3">
-                  <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${data.category}</span>
-                  ${isOwnerLoggedIn ? `
-                    <button onclick="deleteProject('${docSnap.id}')" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
-                      <i class="fa-solid fa-trash"></i>
-                    </button>
-                  ` : ''}
+                  <span class="px-2.5 py-1 rounded-md text-[10px] font-mono font-bold bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">${escapeHtml(data.category)}</span>
+                  <div class="flex items-center gap-2">
+                    <span id="rating-badge-${projectId}" class="px-2 py-0.5 rounded-md text-[11px] font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                      <i class="fa-solid fa-star text-[10px]"></i> <span>New</span>
+                    </span>
+                    ${isOwnerLoggedIn ? `
+                      <button onclick="deleteProject('${projectId}')" title="Delete Build" class="text-xs text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 px-2 py-0.5 rounded border border-red-500/30 transition-all">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    ` : ''}
+                  </div>
                 </div>
-                <h3 class="font-orbitron font-bold text-base text-white mb-2">${data.title}</h3>
-                <p class="text-xs text-slate-300 mb-6 leading-relaxed">${data.description}</p>
+                <h3 class="font-orbitron font-bold text-base text-white mb-2">${safeTitle}</h3>
+                <p class="text-xs text-slate-300 mb-6 leading-relaxed">${escapeHtml(data.description)}</p>
               </div>
-              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between">
-                <span class="text-[10px] font-mono text-slate-500">CLOUD SYNCED</span>
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                <button onclick="openReviewModal('${projectId}', '${safeTitle.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all flex items-center gap-1.5">
+                  <i class="fa-solid fa-star"></i> REVIEWS
+                </button>
                 <a href="${data.pdfUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
                   <i class="fa-solid fa-file-pdf"></i> VIEW PDF
                 </a>
               </div>
             `;
             container.appendChild(card);
+
+            // Live listener for each project's star average
+            onSnapshot(collection(db, "projects", projectId, "reviews"), (revSnap) => {
+              const badge = document.getElementById(`rating-badge-${projectId}`);
+              if (!badge) return;
+              if (revSnap.empty) {
+                badge.innerHTML = `<i class="fa-solid fa-star text-[10px]"></i> <span>Rate</span>`;
+                return;
+              }
+              let sum = 0;
+              revSnap.forEach(d => sum += Number(d.data().rating || 5));
+              const avg = (sum / revSnap.size).toFixed(1);
+              badge.innerHTML = `<i class="fa-solid fa-star text-[10px]"></i> <span>${avg} (${revSnap.size})</span>`;
+            });
           });
         });
       } catch (err) {
@@ -222,10 +429,12 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <div id="role-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 flex items-center gap-1.5">
+        <div id="role-badge" class="hidden sm:flex px-3 py-1 rounded-full text-xs font-mono bg-slate-800 text-slate-400 border border-slate-700 items-center gap-1.5">
           <i class="fa-solid fa-user-shield"></i><span>VIEWER MODE</span>
         </div>
-        <button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold bg-slate-800 text-cyan-400 border border-cyan-500/30">OWNER LOGIN</button>
+        <button id="auth-btn" onclick="openAuthModal()" class="px-4 py-2 rounded-lg text-xs font-orbitron font-bold bg-slate-800 text-cyan-400 border border-cyan-500/30 flex items-center gap-2">
+          <i class="fa-solid fa-lock"></i><span>OWNER LOGIN</span>
+        </button>
         <button id="publish-btn" onclick="openPublishModal()" class="hidden px-4 py-2 rounded-lg text-xs font-orbitron font-bold bg-cyan-500 text-slate-950">PUBLISH BUILD</button>
       </div>
     </div>
@@ -261,17 +470,19 @@
 
   <!-- AUTH MODAL -->
   <div id="auth-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/30">
+    <div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/30 relative">
+      <button onclick="closeAuthModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
       <h3 class="font-orbitron font-bold text-white text-sm mb-4">OWNER ACCESS VERIFICATION</h3>
-      <input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 outline-none" />
+      <input type="password" id="passcode-input" placeholder="Enter owner passcode" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-white mb-2 outline-none focus:border-cyan-500/50" />
       <p id="auth-error" class="text-red-400 text-[11px] font-mono hidden mb-3">Invalid passcode.</p>
-      <button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">VERIFY</button>
+      <button onclick="verifyPasscode()" class="w-full py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs transition-all">VERIFY</button>
     </div>
   </div>
 
   <!-- PUBLISH MODAL -->
   <div id="publish-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
-    <div class="glass-card rounded-2xl p-6 max-w-xl w-full border border-cyan-500/30">
+    <div class="glass-card rounded-2xl p-6 max-w-xl w-full border border-cyan-500/30 relative">
+      <button onclick="closePublishModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-sm"><i class="fa-solid fa-xmark"></i></button>
       <h3 class="font-orbitron font-bold text-white text-base mb-6">PUBLISH HARDWARE BUILD</h3>
       <form id="publish-form" onsubmit="handlePublish(event)" class="space-y-4">
         <input type="text" id="build-title" required placeholder="Build Title" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
@@ -284,6 +495,50 @@
         <input type="url" id="build-pdf-url" required placeholder="Public PDF Link (e.g., Google Drive share link)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none" />
         <button type="submit" class="w-full py-2.5 rounded-lg bg-cyan-500 text-slate-950 font-orbitron font-bold text-xs">PUBLISH TO CLOUD</button>
       </form>
+    </div>
+  </div>
+
+  <!-- PROJECT REVIEWS & COMMENTS MODAL (GOOGLE REVIEW STYLE) -->
+  <div id="review-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-lg w-full border border-cyan-500/30 relative max-h-[90vh] flex flex-col">
+      <button onclick="closeReviewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
+      
+      <div class="mb-4 pr-6">
+        <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-wider">BUILD REVIEWS & FEEDBACK</span>
+        <h3 id="review-project-title" class="font-orbitron font-bold text-white text-base mt-0.5">Project Title</h3>
+        <div id="modal-avg-rating" class="flex items-center gap-2 mt-2"></div>
+      </div>
+
+      <!-- WRITE A REVIEW FORM -->
+      <form id="review-form" onsubmit="submitReview(event)" class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 mb-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-slate-400">YOUR RATING:</span>
+          <div id="star-selector" class="flex items-center gap-1.5 text-lg">
+            <button type="button" onclick="setRating(1)" class="text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setRating(2)" class="text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setRating(3)" class="text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setRating(4)" class="text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+            <button type="button" onclick="setRating(5)" class="text-amber-400 hover:scale-110 transition-transform"><i class="fa-solid fa-star"></i></button>
+          </div>
+        </div>
+
+        <input type="text" id="reviewer-name" oninput="checkLiveInput()" required maxlength="30" placeholder="Your Name (e.g., Arjun)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50" />
+        
+        <textarea id="reviewer-comment" oninput="checkLiveInput()" required rows="2" maxlength="300" placeholder="Share your experience or feedback on this blueprint..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50"></textarea>
+
+        <!-- PROFANITY BLOCK ALERT -->
+        <div id="profanity-warning" class="hidden bg-red-500/15 border border-red-500/40 text-red-400 rounded-lg px-3 py-2 text-[11px] font-mono flex items-center gap-2">
+          <i class="fa-solid fa-ban"></i>
+          <span>Message blocked: Please remove inappropriate words before posting.</span>
+        </div>
+
+        <button id="submit-review-btn" type="submit" class="w-full py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs transition-all">
+          POST REVIEW
+        </button>
+      </form>
+
+      <!-- EXISTING REVIEWS LIST -->
+      <div id="reviews-list" class="overflow-y-auto space-y-2.5 pr-1 flex-grow"></div>
     </div>
   </div>
 
