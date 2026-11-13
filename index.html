@@ -7,10 +7,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   
-  <!-- Firebase SDKs for Projects & Reviews Database -->
+  <!-- Firebase SDKs -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, deleteDoc, doc, updateDoc, increment, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyATUCQJiQS0Juo1U86eFj4pjuT_95iTUc",
@@ -32,9 +32,9 @@
     let currentReviewProjectId = null;
     let selectedStarRating = 5;
     let unsubscribeReviews = null;
+    let unsubscribeSuggestions = null;
 
     // --- PROFANITY / BAD WORD FILTER ---
-    // Add any extra words you want to block inside this list (keep lowercase)
     const BANNED_WORDS = [
       "fuck", "shit", "bitch", "asshole", "bastard", "dick", "pussy",
       "cunt", "slut", "whore", "nigger", "nigga", "faggot", "retard",
@@ -44,7 +44,6 @@
 
     function containsBadWord(text) {
       if (!text) return false;
-      // Normalize text: lowercase, replace common symbol substitutions (@->a, 1->i, 0->o, $->s, 3->e)
       const normalized = text
         .toLowerCase()
         .replace(/@/g, 'a')
@@ -54,7 +53,6 @@
         .replace(/\$/g, 's')
         .replace(/3/g, 'e');
 
-      // Check word-by-word and stripped-spaces version (catches "f u c k")
       const words = normalized.split(/[^a-z]+/).filter(Boolean);
       const squashed = normalized.replace(/[^a-z]/g, '');
 
@@ -63,6 +61,19 @@
         if (bad.length >= 4 && squashed.includes(bad)) return true;
       }
       return false;
+    }
+
+    // --- WHATS NEW POPUP ---
+    function checkWhatsNew() {
+      const seen = localStorage.getItem('anomus_seen_v1.2');
+      if (!seen) {
+        document.getElementById('whats-new-modal').classList.remove('hidden');
+      }
+    }
+
+    window.closeWhatsNew = function() {
+      localStorage.setItem('anomus_seen_v1.2', 'true');
+      document.getElementById('whats-new-modal').classList.add('hidden');
     }
 
     // --- AUTH MODAL LOGIC ---
@@ -138,6 +149,8 @@
           category,
           description,
           pdfUrl,
+          likes: 0,
+          dislikes: 0,
           createdAt: Date.now()
         });
         closePublishModal();
@@ -157,7 +170,90 @@
       }
     }
 
-    // --- GOOGLE-STYLE REVIEWS & COMMENTS MODAL LOGIC ---
+    // --- LIKE / DISLIKE LOGIC ---
+    window.voteProject = async function(projectId, type) {
+      if (!db) return;
+      const voterKey = `voted_${projectId}`;
+      if (localStorage.getItem(voterKey)) {
+        alert("You have already voted on this project!");
+        return;
+      }
+      try {
+        const docRef = doc(db, "projects", projectId);
+        const updateData = type === 'like' ? { likes: increment(1) } : { dislikes: increment(1) };
+        await updateDoc(docRef, updateData);
+        localStorage.setItem(voterKey, type);
+      } catch (err) {
+        alert("Error recording vote.");
+      }
+    }
+
+    // --- SUGGESTIONS BOX LOGIC ---
+    window.submitSuggestion = async function(e) {
+      e.preventDefault();
+      if (!db) return;
+
+      const nameInput = document.getElementById('suggestion-name').value.trim();
+      const textInput = document.getElementById('suggestion-text').value.trim();
+      const warningEl = document.getElementById('suggestion-warning');
+
+      if (containsBadWord(nameInput) || containsBadWord(textInput)) {
+        warningEl.classList.remove('hidden');
+        return;
+      }
+      warningEl.classList.add('hidden');
+
+      const submitBtn = document.getElementById('submit-suggestion-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerText = "SENDING...";
+
+      try {
+        await addDoc(collection(db, "suggestions"), {
+          name: nameInput || "Maker",
+          text: textInput,
+          createdAt: Date.now()
+        });
+        document.getElementById('suggestion-form').reset();
+      } catch (err) {
+        alert("Could not submit suggestion.");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = "SUBMIT SUGGESTION";
+      }
+    }
+
+    function loadSuggestions() {
+      const listEl = document.getElementById('suggestions-list');
+      if (!listEl || !db) return;
+
+      const q = query(collection(db, "suggestions"), orderBy("createdAt", "desc"));
+      if (unsubscribeSuggestions) unsubscribeSuggestions();
+
+      unsubscribeSuggestions = onSnapshot(q, (snapshot) => {
+        listEl.innerHTML = '';
+        if (snapshot.empty) {
+          listEl.innerHTML = '<p class="text-xs font-mono text-slate-500 text-center py-4">No suggestions yet. Be the first!</p>';
+          return;
+        }
+
+        snapshot.forEach((docSnap) => {
+          const s = docSnap.data();
+          const dateStr = s.createdAt ? new Date(s.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '';
+          const item = document.createElement('div');
+          item.className = "bg-slate-950/80 border border-slate-800/80 rounded-xl p-3";
+          item.innerHTML = `
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-xs font-bold text-cyan-400">${escapeHtml(s.name)}</span>
+              <span class="text-[10px] font-mono text-slate-500">${dateStr}</span>
+            </div>
+            <p class="text-xs text-slate-300 leading-relaxed">${escapeHtml(s.text)}</p>
+          `;
+          listEl.appendChild(item);
+        });
+      });
+    }
+
+    // --- REVIEWS & COMMENTS MODAL ---
     window.setRating = function(stars) {
       selectedStarRating = stars;
       const starBtns = document.querySelectorAll('#star-selector button');
@@ -257,7 +353,6 @@
       const commentInput = document.getElementById('reviewer-comment').value.trim();
       const warningEl = document.getElementById('profanity-warning');
 
-      // Block message if bad words are detected in name or comment
       if (containsBadWord(nameInput) || containsBadWord(commentInput)) {
         warningEl.classList.remove('hidden');
         return;
@@ -278,19 +373,27 @@
         document.getElementById('review-form').reset();
         setRating(5);
       } catch (err) {
-        alert("Could not post review. Check Firestore rules for the reviews subcollection.");
+        alert("Could not post review.");
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerText = "POST REVIEW";
       }
     }
 
-    // Live check while typing to hide warning once cleaned
     window.checkLiveInput = function() {
       const nameInput = document.getElementById('reviewer-name').value;
       const commentInput = document.getElementById('reviewer-comment').value;
       const warningEl = document.getElementById('profanity-warning');
       if (!containsBadWord(nameInput) && !containsBadWord(commentInput)) {
+        warningEl.classList.add('hidden');
+      }
+    }
+
+    window.checkSuggestionInput = function() {
+      const nameInput = document.getElementById('suggestion-name').value;
+      const textInput = document.getElementById('suggestion-text').value;
+      const warningEl = document.getElementById('suggestion-warning');
+      if (!containsBadWord(nameInput) && !containsBadWord(textInput)) {
         warningEl.classList.add('hidden');
       }
     }
@@ -303,7 +406,7 @@
         .replace(/"/g, "&quot;");
     }
 
-    // --- LOAD PROJECTS & LIVE RATING SUMMARY ---
+    // --- LOAD PROJECTS & LIKES ---
     async function loadProjects() {
       const container = document.getElementById('projects-container');
       const emptyState = document.getElementById('empty-state');
@@ -323,6 +426,9 @@
             const data = docSnap.data();
             const projectId = docSnap.id;
             const safeTitle = escapeHtml(data.title);
+            const likesCount = data.likes || 0;
+            const dislikesCount = data.dislikes || 0;
+
             const card = document.createElement('div');
             card.className = "glass-card rounded-2xl p-6 flex flex-col justify-between border border-slate-800 hover:border-cyan-500/40 transition-all";
             card.innerHTML = `
@@ -343,18 +449,28 @@
                 <h3 class="font-orbitron font-bold text-base text-white mb-2">${safeTitle}</h3>
                 <p class="text-xs text-slate-300 mb-6 leading-relaxed">${escapeHtml(data.description)}</p>
               </div>
-              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
-                <button onclick="openReviewModal('${projectId}', '${safeTitle.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all flex items-center gap-1.5">
-                  <i class="fa-solid fa-star"></i> REVIEWS
-                </button>
-                <a href="${data.pdfUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
-                  <i class="fa-solid fa-file-pdf"></i> VIEW PDF
-                </a>
+              <div>
+                <!-- LIKE / DISLIKE BUTTONS -->
+                <div class="flex items-center gap-2 mb-3">
+                  <button onclick="voteProject('${projectId}', 'like')" class="flex-1 py-1.5 px-3 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-xs font-mono transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-thumbs-up"></i> <span>${likesCount}</span>
+                  </button>
+                  <button onclick="voteProject('${projectId}', 'dislike')" class="flex-1 py-1.5 px-3 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-mono transition-all flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-thumbs-down"></i> <span>${dislikesCount}</span>
+                  </button>
+                </div>
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between gap-2">
+                  <button onclick="openReviewModal('${projectId}', '${safeTitle.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-mono transition-all flex items-center gap-1.5">
+                    <i class="fa-solid fa-star"></i> REVIEWS
+                  </button>
+                  <a href="${data.pdfUrl}" target="_blank" class="px-3 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400 border border-cyan-500/40 text-xs font-mono transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-file-pdf"></i> VIEW PDF
+                  </a>
+                </div>
               </div>
             `;
             container.appendChild(card);
 
-            // Live listener for each project's star average
             onSnapshot(collection(db, "projects", projectId, "reviews"), (revSnap) => {
               const badge = document.getElementById(`rating-badge-${projectId}`);
               if (!badge) return;
@@ -374,7 +490,6 @@
       }
     }
 
-    // --- SESSION-AWARE VISITOR COUNTER ---
     async function trackVisitor() {
       const counterEl = document.getElementById('visitor-count');
       try {
@@ -401,7 +516,9 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
+      checkWhatsNew();
       loadProjects();
+      loadSuggestions();
       trackVisitor();
     });
   </script>
@@ -414,6 +531,36 @@
   </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
+
+  <!-- WHATS NEW POPUP -->
+  <div id="whats-new-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl p-6 max-w-md w-full border border-cyan-500/40 relative shadow-2xl shadow-cyan-500/20">
+      <div class="flex items-center gap-2 mb-2 text-cyan-400 font-mono text-xs">
+        <i class="fa-solid fa-rocket animate-bounce"></i>
+        <span>RELEASE NOTES</span>
+      </div>
+      <h3 class="font-orbitron font-extrabold text-white text-lg mb-4">What's New in v1.2 ?</h3>
+      
+      <div class="space-y-3 mb-6 text-xs font-mono text-slate-300">
+        <div class="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+          <i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i>
+          <span>Added like button for rating</span>
+        </div>
+        <div class="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+          <i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i>
+          <span>Suggestions box were added</span>
+        </div>
+        <div class="flex items-start gap-2.5 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+          <i class="fa-solid fa-circle-check text-cyan-400 mt-0.5"></i>
+          <span>Review rating by stars</span>
+        </div>
+      </div>
+
+      <button onclick="closeWhatsNew()" class="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs transition-all shadow-lg shadow-cyan-500/20">
+        UNDERSTOOD
+      </button>
+    </div>
+  </div>
 
   <!-- NAVBAR -->
   <header class="border-b border-slate-800 bg-[#070b12]/80 backdrop-blur-md sticky top-0 z-40">
@@ -440,20 +587,56 @@
     </div>
   </header>
 
-  <!-- MAIN -->
+  <!-- MAIN CONTAINER (LAYOUT WITH RIGHT SUGGESTION SIDEBAR) -->
   <main class="max-w-7xl mx-auto px-4 py-10 flex-grow w-full">
     <div class="mb-10 text-center max-w-3xl mx-auto">
       <h1 class="font-orbitron text-3xl font-extrabold text-white mb-3">HARDWARE & ROBOTICS <span class="text-cyan-400">BLUEPRINTS</span></h1>
     </div>
-    <div id="projects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800">
-        <h3 class="font-orbitron text-lg font-bold text-white mb-1">NO PUBLISHED BUILDS YET</h3>
+
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
+      <!-- PROJECTS GRID (3 columns on large screens) -->
+      <div id="projects-container" class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="empty-state" class="col-span-full glass-card rounded-2xl p-12 text-center border-dashed border-slate-800">
+          <h3 class="font-orbitron text-lg font-bold text-white mb-1">NO PUBLISHED BUILDS YET</h3>
+        </div>
       </div>
+
+      <!-- RIGHT SIDEBAR: SUGGESTIONS BOX -->
+      <aside class="lg:col-span-1 glass-card rounded-2xl p-5 border border-cyan-500/30 sticky top-28">
+        <div class="flex items-center gap-2 mb-3">
+          <i class="fa-solid fa-lightbulb text-cyan-400 text-xs"></i>
+          <h3 class="font-orbitron font-bold text-white text-xs uppercase tracking-wider">PROJECT SUGGESTIONS</h3>
+        </div>
+        <p class="text-[11px] text-slate-400 mb-4 leading-relaxed">Have an idea for a new robot or circuit? Drop your suggestion below for everyone to see!</p>
+
+        <!-- SUGGESTION FORM -->
+        <form id="suggestion-form" onsubmit="submitSuggestion(event)" class="space-y-3 mb-5">
+          <input type="text" id="suggestion-name" oninput="checkSuggestionInput()" required maxlength="30" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50" />
+          <textarea id="suggestion-text" oninput="checkSuggestionInput()" required rows="2" maxlength="250" placeholder="Suggest a project..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50"></textarea>
+          
+          <div id="suggestion-warning" class="hidden bg-red-500/15 border border-red-500/40 text-red-400 rounded-lg px-2.5 py-1.5 text-[10px] font-mono flex items-center gap-1.5">
+            <i class="fa-solid fa-ban"></i>
+            <span>Blocked: Remove inappropriate words.</span>
+          </div>
+
+          <button id="submit-suggestion-btn" type="submit" class="w-full py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs transition-all">
+            SUBMIT SUGGESTION
+          </button>
+        </form>
+
+        <!-- LIVE SUGGESTIONS FEED -->
+        <div class="border-t border-slate-800/80 pt-3">
+          <span class="text-[10px] font-mono text-slate-500 uppercase tracking-wider block mb-2">GLOBAL FEED</span>
+          <div id="suggestions-list" class="space-y-2.5 max-h-[350px] overflow-y-auto pr-1">
+            <p class="text-xs font-mono text-slate-500 text-center py-4">Loading suggestions...</p>
+          </div>
+        </div>
+      </aside>
     </div>
   </main>
 
   <!-- FOOTER -->
-  <footer class="border-t border-slate-800 bg-[#070b12]/80 backdrop-blur-md py-8">
+  <footer class="border-t border-slate-800 bg-[#070b12]/80 backdrop-blur-md py-8 mt-12">
     <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
       <div class="flex items-center gap-4">
         <img src="Anomus Pro.png" alt="ANOMUS PRO Logo" class="h-16 w-auto object-contain rounded-lg border border-cyan-500/30 shadow-lg shadow-cyan-500/10" />
@@ -498,7 +681,7 @@
     </div>
   </div>
 
-  <!-- PROJECT REVIEWS & COMMENTS MODAL (GOOGLE REVIEW STYLE) -->
+  <!-- REVIEWS MODAL -->
   <div id="review-modal" class="fixed inset-0 z-50 modal-backdrop hidden flex items-center justify-center p-4">
     <div class="glass-card rounded-2xl p-6 max-w-lg w-full border border-cyan-500/30 relative max-h-[90vh] flex flex-col">
       <button onclick="closeReviewModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-base"><i class="fa-solid fa-xmark"></i></button>
@@ -509,7 +692,6 @@
         <div id="modal-avg-rating" class="flex items-center gap-2 mt-2"></div>
       </div>
 
-      <!-- WRITE A REVIEW FORM -->
       <form id="review-form" onsubmit="submitReview(event)" class="bg-slate-900/70 border border-slate-800 rounded-xl p-4 mb-4 space-y-3">
         <div class="flex items-center justify-between">
           <span class="text-xs font-mono text-slate-400">YOUR RATING:</span>
@@ -522,14 +704,12 @@
           </div>
         </div>
 
-        <input type="text" id="reviewer-name" oninput="checkLiveInput()" required maxlength="30" placeholder="Your Name (e.g., Arjun)" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50" />
-        
-        <textarea id="reviewer-comment" oninput="checkLiveInput()" required rows="2" maxlength="300" placeholder="Share your experience or feedback on this blueprint..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50"></textarea>
+        <input type="text" id="reviewer-name" oninput="checkLiveInput()" required maxlength="30" placeholder="Your Name" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50" />
+        <textarea id="reviewer-comment" oninput="checkLiveInput()" required rows="2" maxlength="300" placeholder="Share your experience..." class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs text-white outline-none focus:border-cyan-500/50"></textarea>
 
-        <!-- PROFANITY BLOCK ALERT -->
         <div id="profanity-warning" class="hidden bg-red-500/15 border border-red-500/40 text-red-400 rounded-lg px-3 py-2 text-[11px] font-mono flex items-center gap-2">
           <i class="fa-solid fa-ban"></i>
-          <span>Message blocked: Please remove inappropriate words before posting.</span>
+          <span>Message blocked: Please remove inappropriate words.</span>
         </div>
 
         <button id="submit-review-btn" type="submit" class="w-full py-2 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-orbitron font-bold text-xs transition-all">
@@ -537,7 +717,6 @@
         </button>
       </form>
 
-      <!-- EXISTING REVIEWS LIST -->
       <div id="reviews-list" class="overflow-y-auto space-y-2.5 pr-1 flex-grow"></div>
     </div>
   </div>
